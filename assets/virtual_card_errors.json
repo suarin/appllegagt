@@ -1,0 +1,152 @@
+[
+  {
+    "ErrorCode": 101,
+    "SpanishDescription": "Error – Funcion no disponible para ese usuario",
+    "EnglishDescription": "Error – Function Not Available for Selected Issuer"
+  },
+  {
+    "ErrorCode": 200,
+    "SpanishDescription": "Error – API credenciales no validas",
+    "EnglishDescription": "Error – API credentials are not valid"
+  },
+  {
+    "ErrorCode": 201,
+    "SpanishDescription": "Error – Wallet ID Invalido",
+    "EnglishDescription": "Error – Invalid Wallet ID"
+  },
+  {
+    "ErrorCode": 202,
+    "SpanishDescription": "Error – Invalido CardIssuerBinID",
+    "EnglishDescription": "Error – Invalid CardIssuerBinID"
+  },
+  {
+    "ErrorCode": 203,
+    "SpanishDescription": "Error – El CardIssuerBinID usado no es valido en el WalletID",
+    "EnglishDescription": "Error – The CardIssuerBinID used is not valid on the WalletID supplied"
+  },
+  {
+    "ErrorCode": 204,
+    "SpanishDescription": "Error – El Nombre no es valido",
+    "EnglishDescription": "Error – The FirstName is not valid"
+  },
+  {
+    "ErrorCode": 205,
+    "SpanishDescription": "Error – El Apellido no es valido",
+    "EnglishDescription": "Error – The LastName is not valid"
+  },
+  {
+    "ErrorCode": 206,
+    "SpanishDescription": "Error – La Direccion no es Valida",
+    "EnglishDescription": "Error – The AdrLine1 is not valid"
+  },
+  {
+    "ErrorCode": 207,
+    "SpanishDescription": "Error – The AdrLine2 is not valid",
+    "EnglishDescription": "Error – The AdrLine2 is not valid"
+  },
+  {
+    "ErrorCode": 208,
+    "SpanishDescription": "Error – La Ciudad no es valida",
+    "EnglishDescription": "Error – The City is not valid"
+  },
+  {
+    "ErrorCode": 209,
+    "SpanishDescription": "Error – La provincia no es valida",
+    "EnglishDescription": "Error – The State is not valid"
+  },
+  {
+    "ErrorCode": 210,
+    "SpanishDescription": "Error – El Pais no es valido",
+    "EnglishDescription": "Error – The Country is not valid"
+  },
+  {
+    "ErrorCode": 211,
+    "SpanishDescription": "Error – El codigo ZIP no es valido",
+    "EnglishDescription": "Error – The ZipCode is not valid"
+  },
+  {
+    "ErrorCode": 212,
+    "SpanishDescription": "Error – El numero de telefono no es valido",
+    "EnglishDescription": "Error – The PhoneNumber is not valid"
+  },
+  {
+    "ErrorCode": 218,
+    "SpanishDescription": "Error – El CardToken no es valido",
+    "EnglishDescription": "Error – The CardToken is not valid"
+  },
+  {
+    "ErrorCode": 219,
+    "SpanishDescription": "Error – El monto no es valido",
+    "EnglishDescription": "Error – The Amount is invalid"
+  },
+  {
+    "ErrorCode": 220,
+    "SpanishDescription": "Error – El CardToken no se encuentra",
+    "EnglishDescription": "Error – The CardToken is not found"
+  },
+  {
+    "ErrorCode": 221,
+    "SpanishDescription": "Error – El monto a remover desde la Tarjeta es mayor que el balance actual",
+    "EnglishDescription": "Error – The Amount to remove from the card is more than the cards current balance."
+  },
+  {
+    "ErrorCode": 223,
+    "SpanishDescription": "Error – El monto a cargar es mayor que los fondos disponibles en el wallet.",
+    "EnglishDescription": "Error – The amount to load is more than the available funds in the wallet"
+  },
+  {
+    "ErrorCode": 224,
+    "SpanishDescription": "Error – Perdida la configuracion del Wallet",
+    "EnglishDescription": "Error – Missing Wallet Settings"
+  },
+  {
+    "ErrorCode": 225,
+    "SpanishDescription": "Error – No se puede mostrar el balance del Wallet",
+    "EnglishDescription": "Error – Could not retrieve wallet balance"
+  },
+  {
+    "ErrorCode": 230,
+    "SpanishDescription": "Error – No hay Transacciones que mostrar para esa Tarjeta",
+    "EnglishDescription": "Error-No Transactions found for supplied Card Token"
+  },
+  {
+    "ErrorCode": 231,
+    "SpanishDescription": "Error – No se puede actualizar la direccion de la Tarjeta",
+    "EnglishDescription": "Error – Could not update card’s address"
+  },
+  {
+    "ErrorCode": 232,
+    "SpanishDescription": "Error – El numero proxy es requerido",
+    "EnglishDescription": "Error – ProxyNum is required"
+  },
+  {
+    "ErrorCode": 233,
+    "SpanishDescription": "Error – El documento de ID no es valido",
+    "EnglishDescription": "Error – SSN is not valid"
+  },
+  {
+    "ErrorCode": 995,
+    "SpanishDescription": "Error – no se pueden remover los fondos de la Tarjeta",
+    "EnglishDescription": "Error – Could not remove funds from card"
+  },
+  {
+    "ErrorCode": 996,
+    "SpanishDescription": "Error – No se puede recargar la Tarjeta",
+    "EnglishDescription": "Error – Could not fund card"
+  },
+  {
+    "ErrorCode": 997,
+    "SpanishDescription": "Error – No se puede obtener el balance de la Tarjeta",
+    "EnglishDescription": "Error – Could not retrieve the card balance. Please contact support"
+  },
+  {
+    "ErrorCode": 998,
+    "SpanishDescription": "Error – No es posible slavar su Tarjeta en nuestra Base de Datos",
+    "EnglishDescription": "Error – We were not able to save your card within our db. Please contact support"
+  },
+  {
+    "ErrorCode": 999,
+    "SpanishDescription": "Error – Anormal  error. Contacte la ayuda para asistencia",
+    "EnglishDescription": "Error – Exception error. Contact support for assistance"
+  }
+]

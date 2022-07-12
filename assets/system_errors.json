@@ -1,0 +1,1092 @@
+[
+  {
+    "ErrorCode": 0,
+    "SpanishDescription": "Procesado correctamente",
+    "EnglishDescription": "Processed correctly"
+  },
+  {
+    "ErrorCode": 1,
+    "SpanishDescription": "Referirse al emisor de la tarjeta / rechazada",
+    "EnglishDescription": "refer to card issuer/decline"
+  },
+  {
+    "ErrorCode": 2,
+    "SpanishDescription": "",
+    "EnglishDescription": "refer to card issuer special conditions"
+  },
+  {
+    "ErrorCode": 3,
+    "SpanishDescription": "",
+    "EnglishDescription": "invalid merchant"
+  },
+  {
+    "ErrorCode": 4,
+    "SpanishDescription": "La FACTURA anterior NO ha sido PAGADA",
+    "EnglishDescription": "The Previus Invoice is NOT Paid"
+  },
+  {
+    "ErrorCode": 5,
+    "SpanishDescription": "",
+    "EnglishDescription": "do not honour"
+  },
+  {
+    "ErrorCode": 6,
+    "SpanishDescription": "",
+    "EnglishDescription": "error"
+  },
+  {
+    "ErrorCode": 7,
+    "SpanishDescription": "",
+    "EnglishDescription": "pick-up card, special condition/pick-up"
+  },
+  {
+    "ErrorCode": 8,
+    "SpanishDescription": "",
+    "EnglishDescription": "honour with identification/approve"
+  },
+  {
+    "ErrorCode": 9,
+    "SpanishDescription": "Solicitud ya en Progreso",
+    "EnglishDescription": "request in progress"
+  },
+  {
+    "ErrorCode": 10,
+    "SpanishDescription": "Usted NO esta pre-registrado en el Sistema",
+    "EnglishDescription": "You are not pre-register on the system"
+  },
+  {
+    "ErrorCode": 11,
+    "SpanishDescription": "",
+    "EnglishDescription": "approved (VIP)/approve"
+  },
+  {
+    "ErrorCode": 12,
+    "SpanishDescription": "Transaccion Invalida. Menos de 24 Hrs",
+    "EnglishDescription": "invalid transaction"
+  },
+  {
+    "ErrorCode": 13,
+    "SpanishDescription": "Monto Invalido",
+    "EnglishDescription": "invalid amount"
+  },
+  {
+    "ErrorCode": 14,
+    "SpanishDescription": "No. de Tarjeta no válido.",
+    "EnglishDescription": "invalid cardnumber (no such number)"
+  },
+  {
+    "ErrorCode": 15,
+    "SpanishDescription": "Emisor NO existe/Denegada",
+    "EnglishDescription": "no such issuer/decline"
+  },
+  {
+    "ErrorCode": 16,
+    "SpanishDescription": "Seleccion Invalida Contrato ya Registrado",
+    "EnglishDescription": "Invalid Agreement Selection"
+  },
+  {
+    "ErrorCode": 17,
+    "SpanishDescription": "",
+    "EnglishDescription": "customer cancellation"
+  },
+  {
+    "ErrorCode": 18,
+    "SpanishDescription": "",
+    "EnglishDescription": "customer dispute"
+  },
+  {
+    "ErrorCode": 19,
+    "SpanishDescription": "Reintente la transacción / Declinada",
+    "EnglishDescription": "reenter transaction/decline"
+  },
+  {
+    "ErrorCode": 20,
+    "SpanishDescription": "",
+    "EnglishDescription": "invalid response"
+  },
+  {
+    "ErrorCode": 21,
+    "SpanishDescription": "",
+    "EnglishDescription": "no action taken"
+  },
+  {
+    "ErrorCode": 22,
+    "SpanishDescription": "",
+    "EnglishDescription": "suspected malfunction"
+  },
+  {
+    "ErrorCode": 23,
+    "SpanishDescription": "",
+    "EnglishDescription": "unacceptable transaction fee/decline"
+  },
+  {
+    "ErrorCode": 24,
+    "SpanishDescription": "",
+    "EnglishDescription": "file action not supported by receiver"
+  },
+  {
+    "ErrorCode": 25,
+    "SpanishDescription": "NO esta autorizado para realizar esta transaccion",
+    "EnglishDescription": "unable to locate record on file"
+  },
+  {
+    "ErrorCode": 26,
+    "SpanishDescription": "",
+    "EnglishDescription": "duplicate file action record, old record replaced"
+  },
+  {
+    "ErrorCode": 27,
+    "SpanishDescription": "Token de Autenticacion Invalido",
+    "EnglishDescription": "Invalid Authentication Token"
+  },
+  {
+    "ErrorCode": 28,
+    "SpanishDescription": "Direccion IP Invalida",
+    "EnglishDescription": "Invalid IP Address"
+  },
+  {
+    "ErrorCode": 29,
+    "SpanishDescription": "",
+    "EnglishDescription": "file action not successful/contact Acquirer"
+  },
+  {
+    "ErrorCode": 30,
+    "SpanishDescription": "",
+    "EnglishDescription": "format error"
+  },
+  {
+    "ErrorCode": 31,
+    "SpanishDescription": "",
+    "EnglishDescription": "bank not supported by switch/decline"
+  },
+  {
+    "ErrorCode": 32,
+    "SpanishDescription": "",
+    "EnglishDescription": "completed partially"
+  },
+  {
+    "ErrorCode": 33,
+    "SpanishDescription": "",
+    "EnglishDescription": "expired card/pick-up"
+  },
+  {
+    "ErrorCode": 34,
+    "SpanishDescription": "",
+    "EnglishDescription": "suspected fraud/pick-up"
+  },
+  {
+    "ErrorCode": 35,
+    "SpanishDescription": "",
+    "EnglishDescription": "card acceptor contact acquirer/pick-up"
+  },
+  {
+    "ErrorCode": 36,
+    "SpanishDescription": "",
+    "EnglishDescription": "restricted card/pick-up"
+  },
+  {
+    "ErrorCode": 37,
+    "SpanishDescription": "",
+    "EnglishDescription": "card acceptor call acquirer security/pick-up"
+  },
+  {
+    "ErrorCode": 38,
+    "SpanishDescription": "",
+    "EnglishDescription": "allowable PIN tries exceeded/pick-up"
+  },
+  {
+    "ErrorCode": 39,
+    "SpanishDescription": "",
+    "EnglishDescription": "no credit account/decline"
+  },
+  {
+    "ErrorCode": 40,
+    "SpanishDescription": "",
+    "EnglishDescription": "requested function/not supported/decline"
+  },
+  {
+    "ErrorCode": 41,
+    "SpanishDescription": "",
+    "EnglishDescription": "lost card/pick-up"
+  },
+  {
+    "ErrorCode": 42,
+    "SpanishDescription": "",
+    "EnglishDescription": "no universal account/decline"
+  },
+  {
+    "ErrorCode": 43,
+    "SpanishDescription": "",
+    "EnglishDescription": "stolen card, pick-up/pick-up"
+  },
+  {
+    "ErrorCode": 44,
+    "SpanishDescription": "",
+    "EnglishDescription": "no investment account/decline"
+  },
+  {
+    "ErrorCode": 51,
+    "SpanishDescription": "Fondos Insuficientes  / Declinada",
+    "EnglishDescription": "no sufficient funds/decline"
+  },
+  {
+    "ErrorCode": 52,
+    "SpanishDescription": "",
+    "EnglishDescription": "no cheque account/decline"
+  },
+  {
+    "ErrorCode": 53,
+    "SpanishDescription": "Token incorrecto",
+    "EnglishDescription": "no savings account/decline"
+  },
+  {
+    "ErrorCode": 54,
+    "SpanishDescription": "",
+    "EnglishDescription": "expired card/decline"
+  },
+  {
+    "ErrorCode": 55,
+    "SpanishDescription": "PIN Incorrecto / Declinada",
+    "EnglishDescription": "incorrect PIN/decline"
+  },
+  {
+    "ErrorCode": 56,
+    "SpanishDescription": "Tarjeta NO existe",
+    "EnglishDescription": "no card record"
+  },
+  {
+    "ErrorCode": 57,
+    "SpanishDescription": "",
+    "EnglishDescription": "transaction not permitted to cardholder/decline"
+  },
+  {
+    "ErrorCode": 58,
+    "SpanishDescription": "transacciÃ³n no permitida a terminal / declina",
+    "EnglishDescription": "transaction not permitted to terminal/decline"
+  },
+  {
+    "ErrorCode": 59,
+    "SpanishDescription": "",
+    "EnglishDescription": "suspected fraud/decline"
+  },
+  {
+    "ErrorCode": 60,
+    "SpanishDescription": "",
+    "EnglishDescription": "card acceptor contact acquirer/decline"
+  },
+  {
+    "ErrorCode": 61,
+    "SpanishDescription": "",
+    "EnglishDescription": "exceeds withdrawal amount limit/decline"
+  },
+  {
+    "ErrorCode": 62,
+    "SpanishDescription": "",
+    "EnglishDescription": "restricted card/decline"
+  },
+  {
+    "ErrorCode": 63,
+    "SpanishDescription": "",
+    "EnglishDescription": "security violation"
+  },
+  {
+    "ErrorCode": 64,
+    "SpanishDescription": "",
+    "EnglishDescription": "original amount incorrect/decline"
+  },
+  {
+    "ErrorCode": 65,
+    "SpanishDescription": "",
+    "EnglishDescription": "exceeds withdrawal frequency limit/decline"
+  },
+  {
+    "ErrorCode": 66,
+    "SpanishDescription": "",
+    "EnglishDescription": "card acceptor call acquirer's security department/decline"
+  },
+  {
+    "ErrorCode": 67,
+    "SpanishDescription": "",
+    "EnglishDescription": "hard capture (requires that card be picked-up at ATM/pick-up)"
+  },
+  {
+    "ErrorCode": 68,
+    "SpanishDescription": "",
+    "EnglishDescription": "response received too late"
+  },
+  {
+    "ErrorCode": 75,
+    "SpanishDescription": "",
+    "EnglishDescription": "allowable number of PIN tries exceeded/decline"
+  },
+  {
+    "ErrorCode": 90,
+    "SpanishDescription": "",
+    "EnglishDescription": "cut off is in progress (Switch ending a day's business and starting the next). Transaction can be sent again in a few minutes)."
+  },
+  {
+    "ErrorCode": 91,
+    "SpanishDescription": "",
+    "EnglishDescription": "issuer or switch is inoperative/decline"
+  },
+  {
+    "ErrorCode": 92,
+    "SpanishDescription": "",
+    "EnglishDescription": "financial institution or intermediate network facility cannot be found for routing/decline"
+  },
+  {
+    "ErrorCode": 93,
+    "SpanishDescription": "",
+    "EnglishDescription": "transaction cannot be completed. Violation of law/decline"
+  },
+  {
+    "ErrorCode": 94,
+    "SpanishDescription": "Transmisión Duplicada",
+    "EnglishDescription": "duplicate transmission"
+  },
+  {
+    "ErrorCode": 95,
+    "SpanishDescription": "",
+    "EnglishDescription": "reconcile error"
+  },
+  {
+    "ErrorCode": 96,
+    "SpanishDescription": "",
+    "EnglishDescription": "system malfunction"
+  },
+  {
+    "ErrorCode": 100,
+    "SpanishDescription": "Transaccion de Credito Pendiente",
+    "EnglishDescription": "Pending Credit Transaction"
+  },
+  {
+    "ErrorCode": 400,
+    "SpanishDescription": "SOLICITUD  INCORRECTA",
+    "EnglishDescription": "BAD REQUEST"
+  },
+  {
+    "ErrorCode": 1001,
+    "SpanishDescription": "Ha ocurrido un error.",
+    "EnglishDescription": "An error has ocurred."
+  },
+  {
+    "ErrorCode": 1002,
+    "SpanishDescription": "Ha ocurrido un error inesperado, por favor contacte a un administrador del sistema.",
+    "EnglishDescription": "An unexpected error has ocurred, please contact IT."
+  },
+  {
+    "ErrorCode": 1003,
+    "SpanishDescription": "La funcionalidad deseada es obsoleta.",
+    "EnglishDescription": "This feature is not longer supported."
+  },
+  {
+    "ErrorCode": 1004,
+    "SpanishDescription": "No se encontró información al respecto.",
+    "EnglishDescription": "No records were found."
+  },
+  {
+    "ErrorCode": 1005,
+    "SpanishDescription": "Error de formato en el protocolo de comunicación.",
+    "EnglishDescription": "Communication protocol format error."
+  },
+  {
+    "ErrorCode": 1010,
+    "SpanishDescription": "El sistema no soporta la institución financiera especificada.",
+    "EnglishDescription": "Supporting banks cannot process the card."
+  },
+  {
+    "ErrorCode": 1011,
+    "SpanishDescription": "No se puede establecer comunicación con la institución financiera.",
+    "EnglishDescription": "Bank cannot be contacted."
+  },
+  {
+    "ErrorCode": 1015,
+    "SpanishDescription": "IIN no válido.",
+    "EnglishDescription": "Invalid IIN."
+  },
+  {
+    "ErrorCode": 1020,
+    "SpanishDescription": "El número de tarjeta ingresado no tiene ninguna tarjeta preautorizada para transferir fondos.",
+    "EnglishDescription": "The card number entered does not have any preauthorized card to transfer funds."
+  },
+  {
+    "ErrorCode": 1021,
+    "SpanishDescription": "La contraseña es incorrecta.",
+    "EnglishDescription": "The password is incorrect."
+  },
+  {
+    "ErrorCode": 1022,
+    "SpanishDescription": "Las contraseñas tecleadas no coinciden.",
+    "EnglishDescription": "The web access passwords you typed do not match."
+  },
+  {
+    "ErrorCode": 1023,
+    "SpanishDescription": "Las contraseñas tecleadas no coinciden o son invalidas.",
+    "EnglishDescription": "The pin you typed do not match or is invalid."
+  },
+  {
+    "ErrorCode": 1024,
+    "SpanishDescription": "ID de Usuario / Contraseña Incorrecta.",
+    "EnglishDescription": "Incorrect User ID/Password."
+  },
+  {
+    "ErrorCode": 1025,
+    "SpanishDescription": "Las contraseñas de pago a través del celular tecleadas no coinciden o son invalidas.",
+    "EnglishDescription": "The web  pin you typed do not match or is invalid."
+  },
+  {
+    "ErrorCode": 1029,
+    "SpanishDescription": "Ha realizado la máxima cantidad de comprobaciones de saldo permitidas en el día.",
+    "EnglishDescription": "You have reached the maximun amount of account balance inquires allowed per day."
+  },
+  {
+    "ErrorCode": 1030,
+    "SpanishDescription": "La transacción no se pudo completar.",
+    "EnglishDescription": "Transaction could not be completed."
+  },
+  {
+    "ErrorCode": 1031,
+    "SpanishDescription": "La transacción no se pudo completar.",
+    "EnglishDescription": "Transaction has timed out."
+  },
+  {
+    "ErrorCode": 1032,
+    "SpanishDescription": "El saldo es insuficiente.",
+    "EnglishDescription": "No sufficient balance."
+  },
+  {
+    "ErrorCode": 1033,
+    "SpanishDescription": "La transacción ha sido rechazada.",
+    "EnglishDescription": "Transaction declined."
+  },
+  {
+    "ErrorCode": 1034,
+    "SpanishDescription": "La transacción viola la política de seguridad establecida por el cliente.",
+    "EnglishDescription": "Customer did not authorize transaction, therefore it can not be processed."
+  },
+  {
+    "ErrorCode": 1035,
+    "SpanishDescription": "Ha realizado la máxima cantidad de depósitos permitidas en el dia.",
+    "EnglishDescription": "You have reached the maximun amount of deposits allowed per day."
+  },
+  {
+    "ErrorCode": 1036,
+    "SpanishDescription": "La cantidad a depositar es mayor que el máximo permitido.",
+    "EnglishDescription": "The amount to be deposited exceeds the maximun allowed."
+  },
+  {
+    "ErrorCode": 1037,
+    "SpanishDescription": "Ha realizado la máxima cantidad de transferencias de fondos permitidas en el día.",
+    "EnglishDescription": "You have reached the maximun amount of transfers allowed per day."
+  },
+  {
+    "ErrorCode": 1038,
+    "SpanishDescription": "La cantidad a transferir es mayor que el máximo permitido.",
+    "EnglishDescription": "The amount to be transferred exceeds the maximum allowed."
+  },
+  {
+    "ErrorCode": 1039,
+    "SpanishDescription": "Ha realizado la máxima cantidad de comprobaciones de transacciones permitidas en el día.",
+    "EnglishDescription": "You have reached the maximun amount of account transactions inquiries allowed per day."
+  },
+  {
+    "ErrorCode": 1040,
+    "SpanishDescription": "La tarjeta está desactivada.",
+    "EnglishDescription": "This card has been deactivated."
+  },
+  {
+    "ErrorCode": 1041,
+    "SpanishDescription": "La tarjeta no ha sido asignada.",
+    "EnglishDescription": "This card has not been assigned."
+  },
+  {
+    "ErrorCode": 1042,
+    "SpanishDescription": "La tarjeta está reportada como perdida.",
+    "EnglishDescription": "This card has been reported as lost."
+  },
+  {
+    "ErrorCode": 1043,
+    "SpanishDescription": "La tarjeta está reportada como robada.",
+    "EnglishDescription": "This card has been reported as stolen."
+  },
+  {
+    "ErrorCode": 1044,
+    "SpanishDescription": "La tarjeta está vencida.",
+    "EnglishDescription": "This card has expired."
+  },
+  {
+    "ErrorCode": 1045,
+    "SpanishDescription": "La tarjeta está en uso.",
+    "EnglishDescription": "This card is in use."
+  },
+  {
+    "ErrorCode": 1046,
+    "SpanishDescription": "La tarjeta ya ha sido asignada a otro cliente.",
+    "EnglishDescription": "This card has been already assigned to another customer."
+  },
+  {
+    "ErrorCode": 1047,
+    "SpanishDescription": "La tarjeta ha sido bloqueada. Por favor contacte a nuestros representantes.",
+    "EnglishDescription": "This card has been blocked. Please contact our customer service department."
+  },
+  {
+    "ErrorCode": 1048,
+    "SpanishDescription": "Ha realizado la máxima cantidad de intentos fallidos para ingresar a su cuenta.",
+    "EnglishDescription": "The daily consecutive failed logins counter has been reached."
+  },
+  {
+    "ErrorCode": 1049,
+    "SpanishDescription": "El número telefónico ha sido bloqueado porque se han la máxima cantidad de intentos de accesso fallidos.",
+    "EnglishDescription": "The telephone number has been blocked because of too many failed system access attempts."
+  },
+  {
+    "ErrorCode": 1050,
+    "SpanishDescription": "El usuario ya está activado.",
+    "EnglishDescription": "This user is already logged on."
+  },
+  {
+    "ErrorCode": 1051,
+    "SpanishDescription": "El usuario ya está desactivado.",
+    "EnglishDescription": "This user has already logged off."
+  },
+  {
+    "ErrorCode": 1052,
+    "SpanishDescription": "El mecanismo de transferencia de llamadas no pudo ser activado.",
+    "EnglishDescription": "This call transfer mechanism could not be enabled."
+  },
+  {
+    "ErrorCode": 1053,
+    "SpanishDescription": "El numero de Poliza NO es Valido",
+    "EnglishDescription": "This Policy Number is NOT valid."
+  },
+  {
+    "ErrorCode": 1054,
+    "SpanishDescription": "Esta tarjeta ha sido reemplazada.",
+    "EnglishDescription": "This card has been replaced."
+  },
+  {
+    "ErrorCode": 1055,
+    "SpanishDescription": "La tarjeta de crédito no pudo ser procesada.",
+    "EnglishDescription": "The credit card number can not be processed."
+  },
+  {
+    "ErrorCode": 1056,
+    "SpanishDescription": "Acceso no válido",
+    "EnglishDescription": "Invalid Access"
+  },
+  {
+    "ErrorCode": 1060,
+    "SpanishDescription": "El número de tarjeta no es válido.",
+    "EnglishDescription": "The specified card number is not valid."
+  },
+  {
+    "ErrorCode": 1061,
+    "SpanishDescription": "La transacción no es válida.",
+    "EnglishDescription": "The specified transaction is not valid."
+  },
+  {
+    "ErrorCode": 1062,
+    "SpanishDescription": "La cantidad no es válida.",
+    "EnglishDescription": "The specified amount is not valid."
+  },
+  {
+    "ErrorCode": 1063,
+    "SpanishDescription": "El identificador del comerciante no es válido.",
+    "EnglishDescription": "The specified merchant ID is not valid."
+  },
+  {
+    "ErrorCode": 1064,
+    "SpanishDescription": "El identificador del empleado no es válido.",
+    "EnglishDescription": "The specified employee ID is not valid."
+  },
+  {
+    "ErrorCode": 1067,
+    "SpanishDescription": "El Numero del Codigo QR NO es Valido",
+    "EnglishDescription": "This QR Code Number is NOT Valid."
+  },
+  {
+    "ErrorCode": 1068,
+    "SpanishDescription": "El passcode no es válido.",
+    "EnglishDescription": "The specified passcode is not valid."
+  },
+  {
+    "ErrorCode": 1069,
+    "SpanishDescription": "El identificador de ATTM es incorrecto.",
+    "EnglishDescription": "The specified ATTM ID is not valid."
+  },
+  {
+    "ErrorCode": 1070,
+    "SpanishDescription": "La interface no es válida.",
+    "EnglishDescription": "The specified interface is not valid."
+  },
+  {
+    "ErrorCode": 1071,
+    "SpanishDescription": "La fecha no es válida.",
+    "EnglishDescription": "The specified date is invalid."
+  },
+  {
+    "ErrorCode": 1072,
+    "SpanishDescription": "DNIS no válido.",
+    "EnglishDescription": "Invalid DNIS."
+  },
+  {
+    "ErrorCode": 1073,
+    "SpanishDescription": "ANI no válido.",
+    "EnglishDescription": "Invalid ANI."
+  },
+  {
+    "ErrorCode": 1074,
+    "SpanishDescription": "La contraseña para el VRU no es válida.",
+    "EnglishDescription": "The VRU password is not valid."
+  },
+  {
+    "ErrorCode": 1075,
+    "SpanishDescription": "La contraseña para el WEB no es válida.",
+    "EnglishDescription": "The WEB password is not valid."
+  },
+  {
+    "ErrorCode": 1076,
+    "SpanishDescription": "El PIN es incorrecto.",
+    "EnglishDescription": "The PIN is incorrect."
+  },
+  {
+    "ErrorCode": 1080,
+    "SpanishDescription": "La respuesta no es válida.",
+    "EnglishDescription": "Response is not valid."
+  },
+  {
+    "ErrorCode": 1081,
+    "SpanishDescription": "El formato no es correcto.",
+    "EnglishDescription": "Format is not valid."
+  },
+  {
+    "ErrorCode": 1082,
+    "SpanishDescription": "No pre-autorización.",
+    "EnglishDescription": "No pre-authorization."
+  },
+  {
+    "ErrorCode": 1083,
+    "SpanishDescription": "Nombre en la Tarjeta no válido",
+    "EnglishDescription": "Invalid Name On Card"
+  },
+  {
+    "ErrorCode": 1084,
+    "SpanishDescription": "Usted ha olvidado uno de los campos requeridos.",
+    "EnglishDescription": "You forgot one of the required field."
+  },
+  {
+    "ErrorCode": 1085,
+    "SpanishDescription": "No hay tarjeta telefónica disponible. Por favor contacte al Departamento de Servicio al Cliente.",
+    "EnglishDescription": "There is not calling card available. Please contact our customer service department."
+  },
+  {
+    "ErrorCode": 1086,
+    "SpanishDescription": "Usuario no válido o Usuario existente. Por favor seleccione otro Usuario.",
+    "EnglishDescription": "Invalid User or Username already taken. Please select another username."
+  },
+  {
+    "ErrorCode": 1087,
+    "SpanishDescription": "El código de activación especificado no es válido.",
+    "EnglishDescription": "The specified activation code is not valid."
+  },
+  {
+    "ErrorCode": 1088,
+    "SpanishDescription": "Número de Autorización de Transferencia no es válido.",
+    "EnglishDescription": "Invalid Transfer Authorization Number (TAN)"
+  },
+  {
+    "ErrorCode": 1089,
+    "SpanishDescription": "El factor no es válida.",
+    "EnglishDescription": "The specified rate is not valid."
+  },
+  {
+    "ErrorCode": 1090,
+    "SpanishDescription": "Usted ya está registrado en el sistema.",
+    "EnglishDescription": "You are already registered in the system"
+  },
+  {
+    "ErrorCode": 1091,
+    "SpanishDescription": "No. de Cuenta no válido.",
+    "EnglishDescription": "Invalid Account No."
+  },
+  {
+    "ErrorCode": 1092,
+    "SpanishDescription": "Por favor seleccione al menos una tarjeta para continuar el proceso de registración.",
+    "EnglishDescription": "Please select at least one card to continue the registration process."
+  },
+  {
+    "ErrorCode": 1093,
+    "SpanishDescription": "Esta transacción tiene que ser procesada desde la Aplicación del POS Virtual.",
+    "EnglishDescription": "This transaction must be conducted from the Virtual POS Application."
+  },
+  {
+    "ErrorCode": 1094,
+    "SpanishDescription": "Distribución de Cantidades Erronea.",
+    "EnglishDescription": "Wrong Amount Distribution."
+  },
+  {
+    "ErrorCode": 1095,
+    "SpanishDescription": "El HardwareID especificado no es válido.",
+    "EnglishDescription": "The specified HardwareID is not valid"
+  },
+  {
+    "ErrorCode": 1096,
+    "SpanishDescription": "La Llave de Encrypcion especificada no es válida.",
+    "EnglishDescription": "The specified Encryption Key is not valid"
+  },
+  {
+    "ErrorCode": 1097,
+    "SpanishDescription": "La URL especificada no es válida (Response.Redirect)",
+    "EnglishDescription": "Invalid URL (Response.Redirect)"
+  },
+  {
+    "ErrorCode": 1098,
+    "SpanishDescription": "El número de teléfono especificado ya está registrado.",
+    "EnglishDescription": "The specified phone number is already registered."
+  },
+  {
+    "ErrorCode": 1100,
+    "SpanishDescription": "Pendiente a verificacion.",
+    "EnglishDescription": "Pending for verification."
+  },
+  {
+    "ErrorCode": 1102,
+    "SpanishDescription": "Ajuste no válido. Por favor contacte nuestro Departamento de Atención al Comercio  al 305-403-7037. Gracias.",
+    "EnglishDescription": "Invalid Transaction Adjustment. Please contact our Merchant Department at 305-403-7037. Thank you."
+  },
+  {
+    "ErrorCode": 1200,
+    "SpanishDescription": "Su Recargo ha excedido el límite de crédito permitido. Por favor contacte nuestro Departamento de Finanzas al 305-403-7037 en horarios de oficina. Gracias.",
+    "EnglishDescription": "Your Reload has exceed the allow credit limit. Please contact our Finance Department at 305-403-7037 during business hours. Thank you."
+  },
+  {
+    "ErrorCode": 1201,
+    "SpanishDescription": "Error en el Pago de Factura. Por favor contacte nuestro Departamento de Atención al Comercio  al 305-403-7037. Gracias.",
+    "EnglishDescription": "Bill Payment Transaction Error. Please contact our Merchant Department at 305-403-7037. Thank you."
+  },
+  {
+    "ErrorCode": 1202,
+    "SpanishDescription": "Ajuste de Pago de Factura no válido. Por favor contacte nuestro Departamento de Atención al Comercio  al 305-403-7037. Gracias.",
+    "EnglishDescription": "Invalid Bill Payment Transaction Adjustment. Please contact our Merchant Department at 305-403-7037. Thank you."
+  },
+  {
+    "ErrorCode": 1301,
+    "SpanishDescription": "ACH Transaction Error",
+    "EnglishDescription": "ACH Transaction Error"
+  },
+  {
+    "ErrorCode": 1302,
+    "SpanishDescription": "Usted debe seleccionar al menos un numero de teléfono.",
+    "EnglishDescription": "You should select at least one phone number"
+  },
+  {
+    "ErrorCode": 1310,
+    "SpanishDescription": "Por favor verifique el No. de Serie del Paquete.",
+    "EnglishDescription": "Please verify TaFacil Package Serial No."
+  },
+  {
+    "ErrorCode": 1320,
+    "SpanishDescription": "",
+    "EnglishDescription": "The phone numbers you entered do not have the same Card ID."
+  },
+  {
+    "ErrorCode": 1331,
+    "SpanishDescription": "El número de ruta no es válido.",
+    "EnglishDescription": "Invalid Routing No."
+  },
+  {
+    "ErrorCode": 1333,
+    "SpanishDescription": "Venta no valida",
+    "EnglishDescription": "Invalid sales"
+  },
+  {
+    "ErrorCode": 1334,
+    "SpanishDescription": "Activacion de Tarjeta de Regalo no valida.",
+    "EnglishDescription": "Invalid Gift Card Activation"
+  },
+  {
+    "ErrorCode": 1390,
+    "SpanishDescription": "El número de la tarjeta de crédito especificado ya está registrado.",
+    "EnglishDescription": "The specified credit card number  is already registered."
+  },
+  {
+    "ErrorCode": 1391,
+    "SpanishDescription": "El número de la cuenta PayNexus especificado ya está registrado.",
+    "EnglishDescription": "The specified PayNexus account number  is already registered."
+  },
+  {
+    "ErrorCode": 1392,
+    "SpanishDescription": "El codigo promocional especificado no es válido.",
+    "EnglishDescription": "The specified promotion code is not valid."
+  },
+  {
+    "ErrorCode": 1393,
+    "SpanishDescription": "El número de teléfono especificado ya está registrado bajo otra Cuenta.",
+    "EnglishDescription": "The specified phone number is already registered under another Telecommunication Account."
+  },
+  {
+    "ErrorCode": 1394,
+    "SpanishDescription": "La dirección de correo electrónico  especificada ya está registrado.",
+    "EnglishDescription": "The specified e-maill address  is already registered."
+  },
+  {
+    "ErrorCode": 1395,
+    "SpanishDescription": "El número de teléfono celular no es válido.",
+    "EnglishDescription": "The cellular phone number is not valid."
+  },
+  {
+    "ErrorCode": 1396,
+    "SpanishDescription": "La cantidad es mayor que el máximo permitido. Por favor llame a la compañia despues de la confirmación.",
+    "EnglishDescription": "The amount exceeds the maximum allowed. Please call the company after confirmation."
+  },
+  {
+    "ErrorCode": 1397,
+    "SpanishDescription": "La cantidad es mayor que el máximo permitido.",
+    "EnglishDescription": "The amount exceeds the maximum allowed."
+  },
+  {
+    "ErrorCode": 1398,
+    "SpanishDescription": "Información del Agente Incompleta",
+    "EnglishDescription": "Incomplete Agent Information"
+  },
+  {
+    "ErrorCode": 1399,
+    "SpanishDescription": "Usted ha excedido el limite máximo de verificación.",
+    "EnglishDescription": "You have exceeded the maximum verification limit."
+  },
+  {
+    "ErrorCode": 1400,
+    "SpanishDescription": "La cuenta ya está activa.",
+    "EnglishDescription": "The account is already activated."
+  },
+  {
+    "ErrorCode": 1401,
+    "SpanishDescription": "Usted necesita enviarnos una identificación valida.",
+    "EnglishDescription": "You need to submit a valid identification"
+  },
+  {
+    "ErrorCode": 1402,
+    "SpanishDescription": "La tarjeta de debito ya está activa.",
+    "EnglishDescription": "The credit card is already activated."
+  },
+  {
+    "ErrorCode": 1403,
+    "SpanishDescription": "La longitud del la Contrasena WEB no es valida.",
+    "EnglishDescription": "The length of the WEB Password is not valid."
+  },
+  {
+    "ErrorCode": 1404,
+    "SpanishDescription": "Usted ha alcanzado la máxima solicitud de tarjetas permitida.",
+    "EnglishDescription": "You have reached the maximum card request allowed."
+  },
+  {
+    "ErrorCode": 1500,
+    "SpanishDescription": "El tipo de divisa debe ser diferente.",
+    "EnglishDescription": "The currency must be different"
+  },
+  {
+    "ErrorCode": 1501,
+    "SpanishDescription": "Usted es el propietario de este item.",
+    "EnglishDescription": "You are the posting member of this item"
+  },
+  {
+    "ErrorCode": 1502,
+    "SpanishDescription": "El item fue ya tomado",
+    "EnglishDescription": "The item was already taken"
+  },
+  {
+    "ErrorCode": 1503,
+    "SpanishDescription": "El tiempo para procesar esta transaccion ha expirado.",
+    "EnglishDescription": "The time to process this transaction has expired."
+  },
+  {
+    "ErrorCode": 1504,
+    "SpanishDescription": "El ID de Usuario  especificado ya está registrado.",
+    "EnglishDescription": "The specified User ID  is already registered."
+  },
+  {
+    "ErrorCode": 1506,
+    "SpanishDescription": "El largo del ID de Usuario no es valido.",
+    "EnglishDescription": "The length of the User ID  is not valid."
+  },
+  {
+    "ErrorCode": 1507,
+    "SpanishDescription": "El Nombre no es es válido.",
+    "EnglishDescription": "Invalid First Name"
+  },
+  {
+    "ErrorCode": 1508,
+    "SpanishDescription": "El Apellido no es es válido.",
+    "EnglishDescription": "Invalid Last Name"
+  },
+  {
+    "ErrorCode": 1509,
+    "SpanishDescription": "La Identificación no es es válida.",
+    "EnglishDescription": "Invalid Personal ID"
+  },
+  {
+    "ErrorCode": 1510,
+    "SpanishDescription": "La Dirección no es es válida.",
+    "EnglishDescription": "Invalid Address"
+  },
+  {
+    "ErrorCode": 1511,
+    "SpanishDescription": "La Ciudad no es es válida.",
+    "EnglishDescription": "Invalid City"
+  },
+  {
+    "ErrorCode": 1512,
+    "SpanishDescription": "El Estado / Ciudad no es es válido.",
+    "EnglishDescription": "Invalid State / Province"
+  },
+  {
+    "ErrorCode": 1513,
+    "SpanishDescription": "El Código Postal no es es válido.",
+    "EnglishDescription": "Invalid Zip Code"
+  },
+  {
+    "ErrorCode": 1514,
+    "SpanishDescription": "El País no es es válido.",
+    "EnglishDescription": "Invalid Country"
+  },
+  {
+    "ErrorCode": 1515,
+    "SpanishDescription": "Respuesta Demorada",
+    "EnglishDescription": "Late Response"
+  },
+  {
+    "ErrorCode": 1516,
+    "SpanishDescription": "Estoy de Acuerdo con los Terminos y Condiciones no fue seleccionado.",
+    "EnglishDescription": "I Agree Terms and Conditions was not selected."
+  },
+  {
+    "ErrorCode": 1517,
+    "SpanishDescription": "La identidad del usuario fue ya verificada.",
+    "EnglishDescription": "The user identity was already verified."
+  },
+  {
+    "ErrorCode": 1518,
+    "SpanishDescription": "Por favor seleccione uno de los Documentos Válidos de Identificación",
+    "EnglishDescription": "Please select one of the Valid Government Identification"
+  },
+  {
+    "ErrorCode": 1519,
+    "SpanishDescription": "Su aplicación está siendo procesada.",
+    "EnglishDescription": "Your application is being processed."
+  },
+  {
+    "ErrorCode": 1520,
+    "SpanishDescription": "Número de Confirmación no válido",
+    "EnglishDescription": "Invalid Confirmation Number"
+  },
+  {
+    "ErrorCode": 1521,
+    "SpanishDescription": "Su Aplicación ha sido aprobada",
+    "EnglishDescription": "Your Application has been approved"
+  },
+  {
+    "ErrorCode": 1522,
+    "SpanishDescription": "Su Aplicación ha sido denegada",
+    "EnglishDescription": "Your Application has been denied"
+  },
+  {
+    "ErrorCode": 1523,
+    "SpanishDescription": "El total de tarjetas solicitadas es menor que el minimo permitido",
+    "EnglishDescription": "The total cards requested is lower than the minimum allowed"
+  },
+  {
+    "ErrorCode": 1524,
+    "SpanishDescription": "Máxima cantidad permitida 100 tarjetas por pedido.",
+    "EnglishDescription": "Maximum allow per order 100 cards"
+  },
+  {
+    "ErrorCode": 1525,
+    "SpanishDescription": "Usted ha alcanzado la maxima cantidad de Tarjetas permitidas por cliente",
+    "EnglishDescription": "You have reached the maximum number of Cards allowed  per customer"
+  },
+  {
+    "ErrorCode": 1526,
+    "SpanishDescription": "Mínima cantidad para la activación $200",
+    "EnglishDescription": "Minimum activation amount $200"
+  },
+  {
+    "ErrorCode": 1527,
+    "SpanishDescription": "El Código Promocional es requerido",
+    "EnglishDescription": "The Promotion Code is required"
+  },
+  {
+    "ErrorCode": 1528,
+    "SpanishDescription": "Su sesion ha sido expirada",
+    "EnglishDescription": "Your session has been expired."
+  },
+  {
+    "ErrorCode": 1529,
+    "SpanishDescription": "El Titulo es requerido.",
+    "EnglishDescription": "The Title is required."
+  },
+  {
+    "ErrorCode": 1530,
+    "SpanishDescription": "Usted debe aceptar los Términos y Condiciones del Titular de la Tarjeta.",
+    "EnglishDescription": "You should agree to the Cardholder Agreement."
+  },
+  {
+    "ErrorCode": 1531,
+    "SpanishDescription": "Usted debe aceptar los Términos y Condiciones del Agente Independiente.",
+    "EnglishDescription": "You should agree to the Independent Agent Terms and Conditions."
+  },
+  {
+    "ErrorCode": 1532,
+    "SpanishDescription": "Usted debe seleccionar al menos una Tarjeta",
+    "EnglishDescription": "You should select at least one card"
+  },
+  {
+    "ErrorCode": 1533,
+    "SpanishDescription": "El código ingresado no coincide. Por favor intente nuevamente...",
+    "EnglishDescription": "Code entered does not match. Please try again…"
+  },
+  {
+    "ErrorCode": 1534,
+    "SpanishDescription": "Numero de Lote no valid",
+    "EnglishDescription": "Invalid Lot No."
+  },
+  {
+    "ErrorCode": 1535,
+    "SpanishDescription": "El email que introdujo no coincide.",
+    "EnglishDescription": "The email you typed do not match."
+  },
+  {
+    "ErrorCode": 1536,
+    "SpanishDescription": "Por favor suministre su nueva direccion de email.",
+    "EnglishDescription": "Please enter your new email address."
+  },
+  {
+    "ErrorCode": 1537,
+    "SpanishDescription": "No hemos podido identificarlo en nuestros registros. Por favor contacte nuestro Servicio al Cliente.",
+    "EnglishDescription": "We are unable to identify you in our records. Please call our Customer Care."
+  },
+  {
+    "ErrorCode": 1538,
+    "SpanishDescription": "Numero de Serie no valido.",
+    "EnglishDescription": "Invalid Serial No."
+  },
+  {
+    "ErrorCode": 1539,
+    "SpanishDescription": "Usted debe seleccionar cada Pregunta de Seguridad",
+    "EnglishDescription": "You should select each Security Question"
+  },
+  {
+    "ErrorCode": 1540,
+    "SpanishDescription": "La tarjeta ha sido ya solicitada.",
+    "EnglishDescription": "The card has already been requested."
+  },
+  {
+    "ErrorCode": 1541,
+    "SpanishDescription": "El pasador móvil que ha escrito no coinciden.",
+    "EnglishDescription": "The mobile pin you typed do not match."
+  },
+  {
+    "ErrorCode": 1544,
+    "SpanishDescription": "NO es una cuenta valida",
+    "EnglishDescription": "NOT Valid AccountNo"
+  }
+]

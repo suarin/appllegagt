@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "DL",
+    "Description": "LICENCIA DE CONDUCIR / DRIVER LICENSE"
+  },
+  {
+    "ID": "DN",
+    "Description":"DNI / CEDULA"
+  },
+  {
+    "ID": "PA",
+    "Description":"PASAPORTE / PASSPORT"
+  },
+  {
+    "ID": "SS",
+    "Description":"SEGURO SOCIAL / SOCIAL SECURITY"
+  }
+]
