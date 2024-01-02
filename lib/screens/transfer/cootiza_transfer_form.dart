@@ -102,7 +102,7 @@ class _CooitzaTransferFormState extends State<CooitzaTransferForm> {
                             ),
                             SizedBox(
                               child: Text(
-                                  'USD ${cardTransferResponse.debitedAmount.toString()}'),
+                                  '${isUS ? "USD " : "Q "} ${cardTransferResponse.debitedAmount.toString()}'),
                               width: 150,
                             ),
                           ],
@@ -218,9 +218,15 @@ class _CooitzaTransferFormState extends State<CooitzaTransferForm> {
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
   @override
   void initState() {
     _getCountryScope();
+    _setLastPage();
     super.initState();
   }
 

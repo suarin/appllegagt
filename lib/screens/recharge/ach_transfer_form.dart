@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:appllegagt/models/bank.dart';
@@ -6,6 +5,7 @@ import 'package:appllegagt/models/general/authorization_response.dart';
 import 'package:appllegagt/services/recharge_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AchTransferForm extends StatefulWidget {
   const AchTransferForm({Key? key}) : super(key: key);
@@ -14,7 +14,8 @@ class AchTransferForm extends StatefulWidget {
   _AchTransferFormState createState() => _AchTransferFormState();
 }
 
-class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingObserver {
+class _AchTransferFormState extends State<AchTransferForm>
+    with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -29,9 +30,10 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
   var screenWidth, screenHeight;
 
   //functions for data pickers
-  _loadBanks() async{
-    String data = await DefaultAssetBundle.of(context).loadString('assets/gt_banks.json');
-    final jsonResult =jsonDecode(data);
+  _loadBanks() async {
+    String data =
+        await DefaultAssetBundle.of(context).loadString('assets/gt_banks.json');
+    final jsonResult = jsonDecode(data);
     setState(() {
       for (int i = 0; i < jsonResult.length; i++) {
         Bank bank = Bank.fromJson(jsonResult[i]);
@@ -42,8 +44,8 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
   }
 
   //functions for dialogs
-  _showSuccessResponse(BuildContext context, AuthorizationResponse authorizationResponse){
-
+  _showSuccessResponse(
+      BuildContext context, AuthorizationResponse authorizationResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -64,14 +66,13 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
                             const SizedBox(
                               child: Text(
                                 'Autorizacion',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(authorizationResponse.authNo.toString()),
+                              child:
+                                  Text(authorizationResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -94,10 +95,9 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -110,7 +110,10 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -129,24 +132,24 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-
-      AuthorizationResponse  authorizationResponse = AuthorizationResponse.fromJson(json);
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
+      AuthorizationResponse authorizationResponse =
+          AuthorizationResponse.fromJson(json);
       _showSuccessResponse(context, authorizationResponse);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset form
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
-      _referenceController.text ='';
-      _amountController.text ='';
+      _referenceController.text = '';
+      _amountController.text = '';
       _passwordController.text = '';
     });
   }
@@ -156,12 +159,18 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
     setState(() {
       isProcessing = true;
     });
-    await RechargeServices.getLoadBank(_passwordController.text,selectedBank!.bankId.toString(),_amountController.text,_referenceController.text)
+    await RechargeServices.getGtLoadBank(
+            _passwordController.text,
+            selectedBank!.bankId.toString(),
+            _amountController.text,
+            _referenceController.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -178,17 +187,24 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
   @override
-  void initState(){
+  void initState() {
     _loadBanks();
+    _setLastPage();
     super.initState();
   }
+
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transferencia ACH'),
+        title: const Text('Información de \n su transferencia'),
         backgroundColor: const Color(0XFF0E325F),
       ),
       backgroundColor: const Color(0XFFAFBECC),
@@ -204,59 +220,65 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
                     ListView(
                       children: [
                         Container(
-                          child: const Text('Cuenta Monetaria Banrural No.3445976788 A nombre de cooperativa la Cas Guatemala'),
+                          child: const Text(
+                              'Cuenta Monetaria Banrural No.3445976788 A nombre de cooperativa la Cas Guatemala'),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
                           padding: const EdgeInsets.only(left: 10.0),
                         ),
-                        bankLoaded ? Container(
-                          child: DropdownButton<Bank>(
-                            hint: const Text('Seleccionar Banco'),
-                            value: selectedBank,
-                            onChanged: (Bank? value){
-                              setState(() {
-                                selectedBank = value;
-                              });
-                            },
-                            items: banks.map((Bank bank) {
-                              return DropdownMenuItem<Bank>(
-                                value: bank,
-                                child: Container(
-                                  padding: const EdgeInsets.only(left: 5.0),
-                                  width: 250,
-                                  child: Text(
-                                    bank.bankName!,
-                                    style: const TextStyle(
-                                      fontSize: 20.0,
-                                      fontFamily: "NanumGothic Bold",
-                                    ),
-                                  ),
+                        bankLoaded
+                            ? Container(
+                                child: DropdownButton<Bank>(
+                                  hint: const Text('Seleccionar Banco'),
+                                  value: selectedBank,
+                                  onChanged: (Bank? value) {
+                                    setState(() {
+                                      selectedBank = value;
+                                    });
+                                  },
+                                  items: banks.map((Bank bank) {
+                                    return DropdownMenuItem<Bank>(
+                                      value: bank,
+                                      child: Container(
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        width: 250,
+                                        child: Text(
+                                          bank.bankName!,
+                                          style: const TextStyle(
+                                            fontSize: 20.0,
+                                            fontFamily: "NanumGothic Bold",
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
-                              );
-                            }).toList(),
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                          width: 250,
-                        ): const Text('No hay Bancos Disponibles'),
+                                decoration: const BoxDecoration(
+                                  color: Color(0XFFEFEFEF),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0)),
+                                ),
+                                height: 50.0,
+                                margin: const EdgeInsets.only(bottom: 5.0),
+                                padding: const EdgeInsets.only(left: 10.0),
+                                width: 250,
+                              )
+                            : const Text('No hay Bancos Disponibles'),
                         Container(
                           child: TextFormField(
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Referencia Transferencia ',
+                              hintText: 'No. Boleta o transferencia ',
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -264,7 +286,8 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -274,11 +297,10 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
                           child: TextFormField(
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
-                                hintText: 'Monto Transferido'
-                            ),
+                                hintText: 'Monto Transferido'),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -286,7 +308,8 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -298,8 +321,8 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
                               border: InputBorder.none,
                               hintText: 'PIN WEB',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -307,7 +330,8 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -323,15 +347,16 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
                                   fontSize: 20.0,
                                 ),
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -348,9 +373,7 @@ class _AchTransferFormState extends State<AchTransferForm> with WidgetsBindingOb
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),

@@ -4,6 +4,8 @@ import 'package:appllegagt/models/transfer/bank_transfer_response.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:appllegagt/services/transfer_services.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class BankTransferForm extends StatefulWidget {
   const BankTransferForm({Key? key}) : super(key: key);
 
@@ -11,8 +13,8 @@ class BankTransferForm extends StatefulWidget {
   _BankTransferFormState createState() => _BankTransferFormState();
 }
 
-class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindingObserver{
-
+class _BankTransferFormState extends State<BankTransferForm>
+    with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -25,19 +27,19 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
   bool isProcessing = false;
   var screenWidth, screenHeight;
 
-  //function to obtain Visa Cards for picker
+  //function to obtain Bank Accounts
   _getBankAccounts() async {
     await TransferServices.getBankAccounts().then((list) => {
-      setState(() {
-        bankAccounts = BankAccounts.fromJson(list);
-        bankAccountsLoaded = true;
-      })
-    });
+          setState(() {
+            bankAccounts = BankAccounts.fromJson(list);
+            bankAccountsLoaded = true;
+          })
+        });
   }
 
   //functions for dialogs
-  _showSuccessResponse(BuildContext context, BankTransferResponse bankTransferResponse){
-
+  _showSuccessResponse(
+      BuildContext context, BankTransferResponse bankTransferResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -58,14 +60,13 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                             const SizedBox(
                               child: Text(
                                 'Tarjeta',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(bankTransferResponse.cardNumber.toString()),
+                              child: Text(
+                                  bankTransferResponse.cardNumber.toString()),
                               width: 150,
                             ),
                           ],
@@ -75,14 +76,13 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                             const SizedBox(
                               child: Text(
                                 'Monto Debitado',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(bankTransferResponse.debitedAmount.toString()),
+                              child: Text(bankTransferResponse.debitedAmount
+                                  .toString()),
                               width: 150,
                             ),
                           ],
@@ -92,14 +92,13 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                             const SizedBox(
                               child: Text(
                                 'Autorizacion',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(bankTransferResponse.authNo.toString()),
+                              child:
+                                  Text(bankTransferResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -122,10 +121,9 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -138,7 +136,10 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -157,20 +158,20 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-
-      BankTransferResponse  bankTransferResponse = BankTransferResponse.fromJson(json);
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
+      BankTransferResponse bankTransferResponse =
+          BankTransferResponse.fromJson(json);
       _showSuccessResponse(context, bankTransferResponse);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset from
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
       _amountController.text = '';
@@ -178,17 +179,24 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
       _passwordController.text = '';
     });
   }
+
   //Execute registration
   _executeTransaction(BuildContext context) async {
     setState(() {
       isProcessing = true;
     });
-    await TransferServices.getBankTransfer(_passwordController.text,_amountController.text, selectedBankAccount!.bankId.toString(),_notesController.text)
+    await TransferServices.getBankTransfer(
+            _passwordController.text,
+            _amountController.text,
+            selectedBankAccount!.bankId.toString(),
+            _notesController.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -205,12 +213,18 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
 
   @override
-  void initState(){
+  void initState() {
     _getBankAccounts();
+    _setLastPage();
     super.initState();
   }
+
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
@@ -231,48 +245,12 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                   children: [
                     ListView(
                       children: [
-                        bankAccountsLoaded
-                            ? Container(
-                          child: DropdownButton<BankAccount>(
-                            hint: const Text('Seleccionar Cuenta Bancaria'),
-                            value: selectedBankAccount,
-                            onChanged: (BankAccount? value) {
-                              setState(() {
-                                selectedBankAccount = value;
-                              });
-                            },
-                            items: bankAccounts!.accounts!
-                                .map((BankAccount bankAccount) {
-                              return DropdownMenuItem<BankAccount>(
-                                value: bankAccount,
-                                child: Container(
-                                  padding: const EdgeInsets.only(left: 5.0),
-                                  width: 250,
-                                  child: Text(
-                                    bankAccount.bankName.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 20.0,
-                                      fontFamily: "NanumGothic Bold",
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                          width: 250,
-                        )
-                            : Container(
+                        Container(
                           child: const Text('Sin Cuentas Bancarias'),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -285,8 +263,8 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                               hintText: 'Monto *',
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -294,7 +272,8 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -306,8 +285,8 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                               border: InputBorder.none,
                               hintText: 'Nota *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -315,7 +294,8 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -325,10 +305,10 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                           child: TextFormField(
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Contraseña *',
+                              hintText: 'Web Pin *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -337,14 +317,15 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
                           padding: const EdgeInsets.only(left: 10.0),
                         ),
                         Visibility(
-                          child:  Container(
+                          child: Container(
                             child: TextButton(
                               child: const Text(
                                 'Solicitar',
@@ -354,14 +335,15 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                                 ),
                               ),
                               onPressed: () {
-                                if(_formKey.currentState!.validate()){
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -378,9 +360,7 @@ class _BankTransferFormState extends State<BankTransferForm>  with WidgetsBindin
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),

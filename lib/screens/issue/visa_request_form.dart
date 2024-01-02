@@ -2,6 +2,7 @@ import 'package:appllegagt/models/general/authorization_response.dart';
 import 'package:appllegagt/services/general_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VisaRequestForm extends StatefulWidget {
   const VisaRequestForm({Key? key}) : super(key: key);
@@ -10,8 +11,8 @@ class VisaRequestForm extends StatefulWidget {
   _VisaRequestFormState createState() => _VisaRequestFormState();
 }
 
-class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingObserver{
-
+class _VisaRequestFormState extends State<VisaRequestForm>
+    with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -26,8 +27,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
   AuthorizationResponse authorizationResponse = AuthorizationResponse();
 
   //functions for dialogs
-  _showSuccessResponse(BuildContext context, AuthorizationResponse authorizationResponse){
-
+  _showSuccessResponse(
+      BuildContext context, AuthorizationResponse authorizationResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -48,14 +49,13 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                             const SizedBox(
                               child: Text(
                                 'No Autorizacion',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(authorizationResponse.authNo.toString()),
+                              child:
+                                  Text(authorizationResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -78,10 +78,9 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -94,7 +93,10 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -113,20 +115,20 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-
-      AuthorizationResponse  authorizationResponse = AuthorizationResponse.fromJson(json);
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
+      AuthorizationResponse authorizationResponse =
+          AuthorizationResponse.fromJson(json);
       _showSuccessResponse(context, authorizationResponse);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset form
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
       _phoneController.text = '';
@@ -143,12 +145,20 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
     setState(() {
       isProcessing = true;
     });
-    await GeneralServices.getVisaRequest(_passwordController.text,_addressController.text,_cityController.text,_provinceController.text,_zipController.text, _phoneController.text)
+    await GeneralServices.getVisaRequest(
+            _passwordController.text,
+            _addressController.text,
+            _cityController.text,
+            _provinceController.text,
+            _zipController.text,
+            _phoneController.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -165,10 +175,19 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
+  @override
+  void initState() {
+    _setLastPage();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
@@ -179,7 +198,7 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
       ),
       backgroundColor: const Color(0XFFAFBECC),
       body: Builder(
-        builder: (context)=> Form(
+        builder: (context) => Form(
           key: _formKey,
           child: SizedBox(
             child: SafeArea(
@@ -189,13 +208,24 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                     ListView(
                       children: [
                         Container(
+                          child: const Text('A donde se envía tarjeta'),
+                          decoration: const BoxDecoration(
+                            color: Color(0XFFEFEFEF),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          height: 50.0,
+                          margin: const EdgeInsets.only(bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 10.0),
+                        ),
+                        Container(
                           child: TextFormField(
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Direccion *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -203,7 +233,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -215,8 +246,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                               border: InputBorder.none,
                               hintText: 'Ciudad *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -224,7 +255,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -236,8 +268,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                               border: InputBorder.none,
                               hintText: 'Provincia *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -245,7 +277,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -257,8 +290,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                               border: InputBorder.none,
                               hintText: 'Codigo Postal *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -267,7 +300,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -279,8 +313,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                               border: InputBorder.none,
                               hintText: 'Telefono *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -289,7 +323,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -299,11 +334,11 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                           child: TextFormField(
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Contraseña *',
+                              hintText: 'Web Pin *',
                             ),
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -311,7 +346,8 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -327,15 +363,16 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                                   fontSize: 20.0,
                                 ),
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -352,9 +389,7 @@ class _VisaRequestFormState extends State<VisaRequestForm>  with WidgetsBindingO
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),

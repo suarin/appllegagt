@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class VisaRegistrationForm extends StatefulWidget  with WidgetsBindingObserver{
+class VisaRegistrationForm extends StatefulWidget with WidgetsBindingObserver {
   const VisaRegistrationForm({Key? key}) : super(key: key);
 
   @override
@@ -8,12 +9,21 @@ class VisaRegistrationForm extends StatefulWidget  with WidgetsBindingObserver{
 }
 
 class _VisaRegistrationFormState extends State<VisaRegistrationForm> {
-
   var screenWidth, screenHeight;
+
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
+  @override
+  void initState() {
+    _setLastPage();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
@@ -32,7 +42,7 @@ class _VisaRegistrationFormState extends State<VisaRegistrationForm> {
                   child: const TextField(
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: 'Contraseña',
+                      hintText: 'Web Pin',
                     ),
                     obscureText: true,
                   ),
@@ -53,7 +63,7 @@ class _VisaRegistrationFormState extends State<VisaRegistrationForm> {
                         fontSize: 20.0,
                       ),
                     ),
-                    onPressed: (){},
+                    onPressed: () {},
                   ),
                   decoration: const BoxDecoration(
                     color: Color(0XFF0E325F),

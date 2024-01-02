@@ -8,7 +8,8 @@ class InternationalCardTransfer extends StatefulWidget {
   const InternationalCardTransfer({Key? key}) : super(key: key);
 
   @override
-  _InternationalCardTransferState createState() => _InternationalCardTransferState();
+  _InternationalCardTransferState createState() =>
+      _InternationalCardTransferState();
 }
 
 class _InternationalCardTransferState extends State<InternationalCardTransfer> {
@@ -27,14 +28,14 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
   //Load Country Scope
   _getCountryScope() async {
     final prefs = await SharedPreferences.getInstance();
-    String countryScope =  prefs.getString('countryScope')!;
-    if(countryScope=='GT'){
+    String countryScope = prefs.getString('countryScope')!;
+    if (countryScope == 'GT') {
       setState(() {
         isGT = true;
       });
     }
 
-    if(countryScope=='US'){
+    if (countryScope == 'US') {
       setState(() {
         isUS = true;
       });
@@ -42,8 +43,8 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
   }
 
   //functions for dialogs
-  _showSuccessResponse(BuildContext context, CardTransferResponse cardTransferResponse){
-
+  _showSuccessResponse(
+      BuildContext context, CardTransferResponse cardTransferResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -64,14 +65,13 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                             const SizedBox(
                               child: Text(
                                 'Autorizacion',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(cardTransferResponse.authNo.toString()),
+                              child:
+                                  Text(cardTransferResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -81,14 +81,14 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                             const SizedBox(
                               child: Text(
                                 'Destinatario',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(cardTransferResponse.transferTo.toString().toUpperCase()),
+                              child: Text(cardTransferResponse.transferTo
+                                  .toString()
+                                  .toUpperCase()),
                               width: 150,
                             ),
                           ],
@@ -98,16 +98,13 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                             const SizedBox(
                               child: Text(
                                 'Monto debitado',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
                               child: Text(
-                                  'USD ${cardTransferResponse.debitedAmount.toString()}'
-                              ),
+                                  '${isUS ? "USD " : "Q "} ${cardTransferResponse.debitedAmount.toString()}'),
                               width: 150,
                             ),
                           ],
@@ -130,10 +127,9 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -146,7 +142,10 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -165,25 +164,25 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-
-      CardTransferResponse  cardTransferResponse = CardTransferResponse.fromJson(json);
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
+      CardTransferResponse cardTransferResponse =
+          CardTransferResponse.fromJson(json);
       _showSuccessResponse(context, cardTransferResponse);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset form
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
       _passwordController.text = '';
-      _notesController.text ='';
-      _amountController.text ='';
+      _notesController.text = '';
+      _amountController.text = '';
       _destinationCardController.text = '';
     });
   }
@@ -193,12 +192,18 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
     setState(() {
       isProcessing = true;
     });
-    await TransferServices.getCardTransferInt(_passwordController.text, _destinationCardController.text,_amountController.text, _notesController.text)
+    await TransferServices.getCardTransferInt(
+            _passwordController.text,
+            _destinationCardController.text,
+            _amountController.text,
+            _notesController.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -215,11 +220,18 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
   @override
-  void initState(){
+  void initState() {
     _getCountryScope();
+    _setLastPage();
     super.initState();
   }
+
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
@@ -239,49 +251,55 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                   children: [
                     ListView(
                       children: [
-                        isUS ? Container(
-                          child:  TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Número de Cuenta YPayMe destino *',
-                            ),
-                            keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
-                                return 'Campo obligatorio';
-                              }
-                            },
-                            controller: _destinationCardController,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                        ):Container(
-                          child:  TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Número de Cuenta yPayme destino *',
-                            ),
-                            keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
-                                return 'Campo obligatorio';
-                              }
-                            },
-                            controller: _destinationCardController,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                        ),
+                        isUS
+                            ? Container(
+                                child: TextFormField(
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText:
+                                        'Número de Cuenta YPayMe destino *',
+                                  ),
+                                  keyboardType: TextInputType.phone,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Campo obligatorio';
+                                    }
+                                  },
+                                  controller: _destinationCardController,
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Color(0XFFEFEFEF),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0)),
+                                ),
+                                height: 50.0,
+                                margin: const EdgeInsets.only(bottom: 5.0),
+                                padding: const EdgeInsets.only(left: 10.0),
+                              )
+                            : Container(
+                                child: TextFormField(
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText:
+                                        'Número de Cuenta yPayme destino *',
+                                  ),
+                                  keyboardType: TextInputType.phone,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Campo obligatorio';
+                                    }
+                                  },
+                                  controller: _destinationCardController,
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Color(0XFFEFEFEF),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10.0)),
+                                ),
+                                height: 50.0,
+                                margin: const EdgeInsets.only(bottom: 5.0),
+                                padding: const EdgeInsets.only(left: 10.0),
+                              ),
                         Container(
                           child: TextFormField(
                             decoration: const InputDecoration(
@@ -289,8 +307,8 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                               hintText: 'Monto *',
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -298,7 +316,8 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -310,8 +329,8 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                               border: InputBorder.none,
                               hintText: 'Nota',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio *';
                               }
                             },
@@ -319,7 +338,8 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -332,8 +352,8 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                               hintText: 'PIN WEB *',
                             ),
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -341,7 +361,8 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -357,15 +378,16 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                                   fontSize: 20.0,
                                 ),
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -382,9 +404,7 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),

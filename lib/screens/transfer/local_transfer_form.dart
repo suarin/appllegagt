@@ -13,8 +13,8 @@ class LocalTransferForm extends StatefulWidget {
   _LocalTransferFormState createState() => _LocalTransferFormState();
 }
 
-class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBindingObserver{
-
+class _LocalTransferFormState extends State<LocalTransferForm>
+    with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -26,38 +26,37 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
   bool isGT = false;
   bool isUS = false;
   var screenWidth, screenHeight;
-  bool accountsLoaded= false;
+  bool accountsLoaded = false;
   BgpAccount? selectedBgpAccount;
   BgpAccounts? bgpAccounts;
   String country = '';
 
-
   //function to obtain GPS Accounts
   _getBgpAccounts() async {
     final prefs = await SharedPreferences.getInstance();
-    String countryScope =  prefs.getString('countryScope')!;
-    if(countryScope=='GT'){
+    String countryScope = prefs.getString('countryScope')!;
+    if (countryScope == 'GT') {
       setState(() {
         isGT = true;
       });
     }
 
-    if(countryScope=='US'){
+    if (countryScope == 'US') {
       setState(() {
         isUS = true;
       });
     }
     await TransferServices.getBgpAccounts(countryScope).then((list) => {
-      setState(() {
-        bgpAccounts = BgpAccounts.fromJson(list);
-        accountsLoaded = true;
-      })
-    });
+          setState(() {
+            bgpAccounts = BgpAccounts.fromJson(list);
+            accountsLoaded = true;
+          })
+        });
   }
 
   //functions for dialogs
-  _showSuccessResponse(BuildContext context, CardTransferResponse cardTransferResponse){
-
+  _showSuccessResponse(
+      BuildContext context, CardTransferResponse cardTransferResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -78,14 +77,13 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                             const SizedBox(
                               child: Text(
                                 'Autorizacion',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(cardTransferResponse.authNo.toString()),
+                              child:
+                                  Text(cardTransferResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -95,14 +93,14 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                             const SizedBox(
                               child: Text(
                                 'Destinatario',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(cardTransferResponse.transferTo.toString().toUpperCase()),
+                              child: Text(cardTransferResponse.transferTo
+                                  .toString()
+                                  .toUpperCase()),
                               width: 150,
                             ),
                           ],
@@ -112,16 +110,13 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                             const SizedBox(
                               child: Text(
                                 'Monto debitado',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
                               child: Text(
-                                'USD ${cardTransferResponse.debitedAmount.toString()}'
-                              ),
+                                  '${isUS ? "USD " : "Q "} ${cardTransferResponse.debitedAmount.toString()}'),
                               width: 150,
                             ),
                           ],
@@ -144,10 +139,9 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -160,7 +154,10 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -179,24 +176,25 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-      CardTransferResponse  cardTransferResponse = CardTransferResponse.fromJson(json);
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
+      CardTransferResponse cardTransferResponse =
+          CardTransferResponse.fromJson(json);
       _showSuccessResponse(context, cardTransferResponse);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset form
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
       _passwordController.text = '';
-      _notesController.text ='';
-      _amountController.text ='';
+      _notesController.text = '';
+      _amountController.text = '';
       _destinationCardController.text = '';
     });
   }
@@ -207,12 +205,18 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
       isProcessing = true;
     });
 
-    await TransferServices.getCardTransfer(_passwordController.text, selectedBgpAccount!.accountNo.toString(),_amountController.text, _notesController.text)
+    await TransferServices.getCardTransfer(
+            _passwordController.text,
+            selectedBgpAccount!.accountNo.toString(),
+            _amountController.text,
+            _notesController.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -229,20 +233,25 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
   @override
-  void initState(){
+  void initState() {
     _getBgpAccounts();
+    _setLastPage();
     super.initState();
   }
-  Widget build(BuildContext context) {
 
+  Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transferencia a cuenta \n  local'),
+        title: const Text('Transferencia a \ncuenta  local'),
         backgroundColor: const Color(0XFF0E325F),
       ),
       backgroundColor: const Color(0XFFAFBECC),
@@ -258,69 +267,68 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                       children: [
                         accountsLoaded
                             ? Container(
-                          child: DropdownButton<BgpAccount>(
-                            hint: const Text(
-                              'Seleccionar Cuenta',
-                              style: TextStyle(
-                                color: Colors.black26,
-                                fontFamily: 'VarelaRoundRegular',
-                              ),
-                            ),
-                            value: selectedBgpAccount,
-                            onChanged: (BgpAccount? value) {
-                              setState(() {
-                                selectedBgpAccount = value;
-                              });
-                            },
-                            items: bgpAccounts!.accounts!
-                                .map((BgpAccount bgpAccount) {
-                              return DropdownMenuItem<BgpAccount>(
-                                value: bgpAccount,
-                                child: Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 5.0),
-                                  width: 250,
-                                  child: Text(
-                                    '${bgpAccount.holderName}',
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily:
-                                      'VarelaRoundRegular',
+                                child: DropdownButton<BgpAccount>(
+                                  hint: const Text(
+                                    'Seleccionar Cuenta',
+                                    style: TextStyle(
+                                      color: Colors.black26,
+                                      fontFamily: 'VarelaRoundRegular',
                                     ),
                                   ),
+                                  value: selectedBgpAccount,
+                                  onChanged: (BgpAccount? value) {
+                                    setState(() {
+                                      selectedBgpAccount = value;
+                                    });
+                                  },
+                                  items: bgpAccounts!.accounts!
+                                      .map((BgpAccount bgpAccount) {
+                                    return DropdownMenuItem<BgpAccount>(
+                                      value: bgpAccount,
+                                      child: Container(
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        width: 250,
+                                        child: Text(
+                                          '${bgpAccount.holderName}',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'VarelaRoundRegular',
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
-                              );
-                            }).toList(),
-                          ),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                              borderRadius: const BorderRadius.all(
-                                  Radius.circular(30.0))),
-                          margin: const EdgeInsets.only(bottom: 15.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                          width: 300,
-                        )
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                margin: const EdgeInsets.only(bottom: 15.0),
+                                padding: const EdgeInsets.only(left: 10.0),
+                                width: 300,
+                              )
                             : Container(
-                          child: const TextField(
-                            decoration: InputDecoration(
-                                label: Text(
-                                  'Sin Tarjetas',
-                                  style: TextStyle(
-                                    color: Colors.black26,
-                                    fontFamily: 'VarelaRoundRegular',
-                                  ),
+                                child: const TextField(
+                                  decoration: InputDecoration(
+                                      label: Text(
+                                        'Sin Tarjetas',
+                                        style: TextStyle(
+                                          color: Colors.black26,
+                                          fontFamily: 'VarelaRoundRegular',
+                                        ),
+                                      ),
+                                      border: InputBorder.none),
+                                  keyboardType: TextInputType.phone,
                                 ),
-                                border: InputBorder.none),
-                            keyboardType: TextInputType.phone,
-                          ),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                              borderRadius: const BorderRadius.all(
-                                  Radius.circular(30.0))),
-                          margin: const EdgeInsets.only(bottom: 15.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                          width: 300,
-                        ),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                margin: const EdgeInsets.only(bottom: 15.0),
+                                padding: const EdgeInsets.only(left: 10.0),
+                                width: 300,
+                              ),
                         Container(
                           child: TextFormField(
                             decoration: const InputDecoration(
@@ -328,8 +336,8 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                               hintText: 'Monto *',
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -337,7 +345,8 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -349,8 +358,8 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                               border: InputBorder.none,
                               hintText: 'Nota',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio *';
                               }
                             },
@@ -358,7 +367,8 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -371,8 +381,8 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                               hintText: 'PIN WEB *',
                             ),
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -380,7 +390,8 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -396,15 +407,16 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                                   fontSize: 20.0,
                                 ),
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -421,9 +433,7 @@ class _LocalTransferFormState extends State<LocalTransferForm>  with WidgetsBind
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),

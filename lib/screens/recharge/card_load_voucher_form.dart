@@ -17,8 +17,8 @@ class CardLoadVoucherForm extends StatefulWidget {
   _CardLoadVoucherFormState createState() => _CardLoadVoucherFormState();
 }
 
-class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with WidgetsBindingObserver{
-
+class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>
+    with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -39,32 +39,33 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
   //function to obtain Visa Cards for picker
   _getVirtualCards() async {
     await GeneralServices.getVirtualCards().then((list) => {
-      setState(() {
-        visaCardsResponse = VisaCardsResponse.fromJson(list);
-        visaCardsLoaded = true;
-      })
-    });
+          setState(() {
+            visaCardsResponse = VisaCardsResponse.fromJson(list);
+            visaCardsLoaded = true;
+          })
+        });
   }
 
   //Get user data
   _getUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    LoginSuccessResponse  loginSuccessResponse = LoginSuccessResponse(
+    LoginSuccessResponse loginSuccessResponse = LoginSuccessResponse(
         errorCode: 0,
         cHolderID: prefs.getInt('cHolderID'),
         userName: prefs.getString('userName'),
         cardNo: prefs.getString('cardNo'),
         currency: prefs.getString('currency'),
-        balance: prefs.getString('balance')
-    );
+        balance: prefs.getString('balance'));
     setState(() {
       _virtualCardController.text = loginSuccessResponse.cardNo.toString();
     });
   }
+
   //functions for data pickers
-  _loadPaymentTypes() async{
-    String data = await DefaultAssetBundle.of(context).loadString('assets/payment_types.json');
-    final jsonResult =jsonDecode(data);
+  _loadPaymentTypes() async {
+    String data = await DefaultAssetBundle.of(context)
+        .loadString('assets/payment_types.json');
+    final jsonResult = jsonDecode(data);
     setState(() {
       for (int i = 0; i < jsonResult.length; i++) {
         PaymentType paymentType = PaymentType.fromJson(jsonResult[i]);
@@ -74,8 +75,8 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
   }
 
   //functions for dialogs
-  _showSuccessResponse(BuildContext context, CardLoadVoucherResponse cardLoadVoucherResponse){
-
+  _showSuccessResponse(
+      BuildContext context, CardLoadVoucherResponse cardLoadVoucherResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -96,14 +97,13 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                             const SizedBox(
                               child: Text(
                                 'Monto Acreditado',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(cardLoadVoucherResponse.amountLoad.toString()),
+                              child: Text(cardLoadVoucherResponse.amountLoad
+                                  .toString()),
                               width: 150,
                             ),
                           ],
@@ -120,14 +120,13 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                             const SizedBox(
                               child: Text(
                                 'Autorizacion',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(cardLoadVoucherResponse.authNo.toString()),
+                              child: Text(
+                                  cardLoadVoucherResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -150,10 +149,9 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -166,7 +164,10 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -185,26 +186,26 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-
-      CardLoadVoucherResponse  cardLoadVoucherResponse = CardLoadVoucherResponse.fromJson(json);
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
+      CardLoadVoucherResponse cardLoadVoucherResponse =
+          CardLoadVoucherResponse.fromJson(json);
       _showSuccessResponse(context, cardLoadVoucherResponse);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset form
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
-      _voucherController.text='';
-      _mobileController.text='';
-      _merchantController.text ='';
-      _virtualCardController.text ='';
+      _voucherController.text = '';
+      _mobileController.text = '';
+      _merchantController.text = '';
+      _virtualCardController.text = '';
     });
   }
 
@@ -213,12 +214,19 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
     setState(() {
       isProcessing = true;
     });
-    await RechargeServices.getCardLoadVoucher(_merchantController.text,selectedPaymentType!.typeId.toString(),_voucherController.text,_virtualCardController.text,_mobileController.text)
+    await RechargeServices.getCardLoadVoucher(
+            _merchantController.text,
+            selectedPaymentType!.typeId.toString(),
+            _voucherController.text,
+            _virtualCardController.text,
+            _mobileController.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -235,13 +243,20 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
   @override
-  void initState(){
+  void initState() {
     _getVirtualCards();
     _loadPaymentTypes();
     _getUserData();
+    _setLastPage();
     super.initState();
   }
+
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
@@ -266,13 +281,13 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                           child: DropdownButton<PaymentType>(
                             hint: const Text('Seleccionar Tipo'),
                             value: selectedPaymentType,
-                            onChanged: (PaymentType? value){
+                            onChanged: (PaymentType? value) {
                               setState(() {
                                 selectedPaymentType = value;
-                                if(value!.typeId == 'P'){
+                                if (value!.typeId == 'P') {
                                   showMobileField = true;
                                   _mobileController.text = '';
-                                }else{
+                                } else {
                                   showMobileField = false;
                                   _mobileController.text = '0';
                                 }
@@ -297,7 +312,8 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -314,8 +330,8 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                               ),
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -323,7 +339,8 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -339,8 +356,8 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                               ),
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -348,7 +365,8 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -357,15 +375,15 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                         Container(
                           child: TextFormField(
                             decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'No Voucher *',
-                                errorStyle: TextStyle(
-                                  fontSize: 8,
-                                ),
+                              border: InputBorder.none,
+                              hintText: 'No Voucher *',
+                              errorStyle: TextStyle(
+                                fontSize: 8,
+                              ),
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -373,7 +391,8 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -390,8 +409,8 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                                 ),
                               ),
                               keyboardType: TextInputType.phone,
-                              validator: (value){
-                                if(value == null || value.isEmpty){
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
                                   return 'Campo obligatorio';
                                 }
                               },
@@ -399,7 +418,8 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFFEFEFEF),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             height: 50.0,
                             margin: const EdgeInsets.only(bottom: 5.0),
@@ -408,7 +428,7 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                           visible: showMobileField,
                         ),
                         Visibility(
-                          child:  Container(
+                          child: Container(
                             child: TextButton(
                               child: const Text(
                                 'Recargar',
@@ -418,14 +438,15 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                                 ),
                               ),
                               onPressed: () {
-                                if(_formKey.currentState!.validate()){
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -442,9 +463,7 @@ class _CardLoadVoucherFormState extends State<CardLoadVoucherForm>  with Widgets
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                         ),

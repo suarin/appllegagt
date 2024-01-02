@@ -1,13 +1,11 @@
-import 'package:appllegagt/models/general/visa_cards_response.dart';
 import 'package:appllegagt/screens/issue/account_screen.dart';
-import 'package:appllegagt/screens/issue/bills_screen.dart';
 import 'package:appllegagt/screens/issue/password_form.dart';
 import 'package:appllegagt/screens/issue/virtual_card_balance_form.dart';
 import 'package:appllegagt/screens/issue/visa_balance_form.dart';
 import 'package:appllegagt/screens/issue/visa_request_form.dart';
 import 'package:appllegagt/screens/issue/web_pin_form.dart';
-import 'package:appllegagt/services/general_services.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class IssueOptionsScreen extends StatefulWidget {
   const IssueOptionsScreen({Key? key}) : super(key: key);
@@ -16,10 +14,20 @@ class IssueOptionsScreen extends StatefulWidget {
   _IssueOptionsScreenState createState() => _IssueOptionsScreenState();
 }
 
-class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBindingObserver{
-
-
+class _IssueOptionsScreenState extends State<IssueOptionsScreen>
+    with WidgetsBindingObserver {
   var screenWidth, screenHeight;
+
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
+  @override
+  void initState() {
+    _setLastPage();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +47,10 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                 child: SizedBox(
                   child: Container(
                     decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
-                      color: Colors.white
-                    ),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20.0),
+                            topRight: Radius.circular(20.0)),
+                        color: Colors.white),
                   ),
                   height: screenHeight * 0.80,
                   width: screenWidth,
@@ -56,11 +65,9 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                         child: TextButton(
                           child: const Text(
                             'Perfil del ciente',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
+                            style: TextStyle(color: Colors.white),
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -71,20 +78,18 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                         ),
                         decoration: const BoxDecoration(
                             color: Color(0xFF0E2238),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0))
-                        ),
-                       margin: const EdgeInsets.only(bottom: 5.0),
-                       width: 325,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
+                        margin: const EdgeInsets.only(bottom: 5.0),
+                        width: 325,
                       ),
                       Container(
                         child: TextButton(
                           child: const Text(
                             'Cambio Web Pin',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
+                            style: TextStyle(color: Colors.white),
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -95,8 +100,8 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                         ),
                         decoration: const BoxDecoration(
                             color: Color(0xFF0E2238),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0))
-                        ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                         margin: const EdgeInsets.only(bottom: 5.0),
                         width: 325,
                       ),
@@ -104,11 +109,9 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                         child: TextButton(
                           child: const Text(
                             'Recuperar contraseña',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
+                            style: TextStyle(color: Colors.white),
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -119,8 +122,8 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                         ),
                         decoration: const BoxDecoration(
                             color: Color(0xFF0E2238),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0))
-                        ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                         margin: const EdgeInsets.only(bottom: 5.0),
                         width: 325,
                       ),
@@ -128,11 +131,9 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                         child: TextButton(
                           child: const Text(
                             'Solicitar Tarjeta Visa',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
+                            style: TextStyle(color: Colors.white),
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -143,8 +144,8 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                         ),
                         decoration: const BoxDecoration(
                             color: Color(0xFF0E2238),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0))
-                        ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                         margin: const EdgeInsets.only(bottom: 5.0),
                         width: 325,
                       ),
@@ -152,23 +153,20 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                         child: TextButton(
                           child: const Text(
                             'Solicitar Saldo Visa',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
+                            style: TextStyle(color: Colors.white),
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const VisaBalanceForm(),
-                              )
-                            );
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const VisaBalanceForm(),
+                                ));
                           },
                         ),
                         decoration: const BoxDecoration(
                             color: Color(0xFF0E2238),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0))
-                        ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                         margin: const EdgeInsets.only(bottom: 5.0),
                         width: 325,
                       ),
@@ -176,27 +174,24 @@ class _IssueOptionsScreenState extends State<IssueOptionsScreen>  with WidgetsBi
                         child: TextButton(
                           child: const Text(
                             'Solicitar Saldo Tarjeta Virtual',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
+                            style: TextStyle(color: Colors.white),
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const VirtualCardBalanceForm(),
-                                )
-                            );
+                                  builder: (context) =>
+                                      const VirtualCardBalanceForm(),
+                                ));
                           },
                         ),
                         decoration: const BoxDecoration(
                             color: Color(0xFF0E2238),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0))
-                        ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                         margin: const EdgeInsets.only(bottom: 5.0),
                         width: 325,
                       ),
-
                     ],
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   ),

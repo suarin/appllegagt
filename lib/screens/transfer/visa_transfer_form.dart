@@ -5,6 +5,7 @@ import 'package:appllegagt/services/general_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:appllegagt/services/transfer_services.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VisaTransferForm extends StatefulWidget {
   const VisaTransferForm({Key? key}) : super(key: key);
@@ -13,8 +14,8 @@ class VisaTransferForm extends StatefulWidget {
   _VisaTransferFormState createState() => _VisaTransferFormState();
 }
 
-class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindingObserver{
-
+class _VisaTransferFormState extends State<VisaTransferForm>
+    with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -31,15 +32,16 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
   //function to obtain Visa Cards for picker
   _getVisaCards() async {
     await GeneralServices.getVisaCards().then((list) => {
-      setState(() {
-        cards = VisaCardsResponse.fromJson(list);
-        visaCardsLoaded = true;
-      })
-    });
+          setState(() {
+            cards = VisaCardsResponse.fromJson(list);
+            visaCardsLoaded = true;
+          })
+        });
   }
-  //functions for dialogs
-  _showSuccessResponse(BuildContext context, AuthorizationResponse authorizationResponse){
 
+  //functions for dialogs
+  _showSuccessResponse(
+      BuildContext context, AuthorizationResponse authorizationResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -60,14 +62,13 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
                             const SizedBox(
                               child: Text(
                                 'No Autorizacion',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(authorizationResponse.authNo.toString()),
+                              child:
+                                  Text(authorizationResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -90,10 +91,9 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -106,7 +106,10 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -125,24 +128,24 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    try{
-      if(json['ErrorCode'] == 0){
-
-        AuthorizationResponse  authorizationResponse = AuthorizationResponse.fromJson(json);
+  _checkResponse(BuildContext context, dynamic json) async {
+    try {
+      if (json['ErrorCode'] == 0) {
+        AuthorizationResponse authorizationResponse =
+            AuthorizationResponse.fromJson(json);
         _showSuccessResponse(context, authorizationResponse);
-
-      } else{
-        String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+      } else {
+        String errorMessage =
+            await SystemErrors.getSystemError(json['ErrorCode']);
         _showErrorResponse(context, errorMessage);
       }
-    }catch(e){
+    } catch (e) {
       _showErrorResponse(context, e.toString());
     }
   }
 
   //Reset From
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
       _passwordController.text = '';
@@ -156,13 +159,15 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
     setState(() {
       isProcessing = true;
     });
-    await TransferServices.getVisaLoad(_passwordController.text,_amountController.text,selectedVisaCard!.cardNo.toString())
+    await TransferServices.getVisaLoad(_passwordController.text,
+            _amountController.text, selectedVisaCard!.cardNo.toString())
         .then((response) => {
-          
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -176,35 +181,38 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
       );
 
       _resetForm();
-
     });
 
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
   @override
   void initState() {
     _getVisaCards();
+    _setLastPage();
     super.initState();
   }
-  Widget build(BuildContext context) {
 
+  Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-            'Transferencia a \n Tarjeta Visa',
-          style: TextStyle(
-            fontSize: 16
-          ),
+          'Transferencia a \n Tarjeta Visa',
+          style: TextStyle(fontSize: 16),
         ),
         backgroundColor: const Color(0XFF0E325F),
       ),
       backgroundColor: const Color(0XFFAFBECC),
       body: Builder(
-        builder: (context)=>Form(
+        builder: (context) => Form(
           key: _formKey,
           child: SizedBox(
             child: SafeArea(
@@ -215,69 +223,68 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
                       children: [
                         visaCardsLoaded
                             ? Container(
-                          child: DropdownButton<VisaCard>(
-                            hint: const Text(
-                              'Seleccionar Tarjeta',
-                              style: TextStyle(
-                                color: Colors.black26,
-                                fontFamily: 'VarelaRoundRegular',
-                              ),
-                            ),
-                            value: selectedVisaCard,
-                            onChanged: (VisaCard? value) {
-                              setState(() {
-                                selectedVisaCard = value;
-                              });
-                            },
-                            items: cards!.visaCards!
-                                .map((VisaCard visaCard) {
-                              return DropdownMenuItem<VisaCard>(
-                                value: visaCard,
-                                child: Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 5.0),
-                                  width: 250,
-                                  child: Text(
-                                    '${visaCard.cardNo}',
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily:
-                                      'VarelaRoundRegular',
+                                child: DropdownButton<VisaCard>(
+                                  hint: const Text(
+                                    'Seleccionar Tarjeta',
+                                    style: TextStyle(
+                                      color: Colors.black26,
+                                      fontFamily: 'VarelaRoundRegular',
                                     ),
                                   ),
+                                  value: selectedVisaCard,
+                                  onChanged: (VisaCard? value) {
+                                    setState(() {
+                                      selectedVisaCard = value;
+                                    });
+                                  },
+                                  items: cards!.visaCards!
+                                      .map((VisaCard visaCard) {
+                                    return DropdownMenuItem<VisaCard>(
+                                      value: visaCard,
+                                      child: Container(
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        width: 250,
+                                        child: Text(
+                                          '${visaCard.cardNo}',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'VarelaRoundRegular',
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
-                              );
-                            }).toList(),
-                          ),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                              borderRadius: const BorderRadius.all(
-                                  Radius.circular(30.0))),
-                          margin: const EdgeInsets.only(bottom: 15.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                          width: 300,
-                        )
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                margin: const EdgeInsets.only(bottom: 15.0),
+                                padding: const EdgeInsets.only(left: 10.0),
+                                width: 300,
+                              )
                             : Container(
-                          child: const TextField(
-                            decoration: InputDecoration(
-                                label: Text(
-                                  'Sin Tarjetas',
-                                  style: TextStyle(
-                                    color: Colors.black26,
-                                    fontFamily: 'VarelaRoundRegular',
-                                  ),
+                                child: const TextField(
+                                  decoration: InputDecoration(
+                                      label: Text(
+                                        'Sin Tarjetas',
+                                        style: TextStyle(
+                                          color: Colors.black26,
+                                          fontFamily: 'VarelaRoundRegular',
+                                        ),
+                                      ),
+                                      border: InputBorder.none),
+                                  keyboardType: TextInputType.phone,
                                 ),
-                                border: InputBorder.none),
-                            keyboardType: TextInputType.phone,
-                          ),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                              borderRadius: const BorderRadius.all(
-                                  Radius.circular(30.0))),
-                          margin: const EdgeInsets.only(bottom: 15.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                          width: 300,
-                        ),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                margin: const EdgeInsets.only(bottom: 15.0),
+                                padding: const EdgeInsets.only(left: 10.0),
+                                width: 300,
+                              ),
                         Container(
                           child: TextFormField(
                             decoration: const InputDecoration(
@@ -285,8 +292,8 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
                               hintText: 'Monto *',
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -294,7 +301,8 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -307,8 +315,8 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
                               hintText: 'PIN WEB *',
                             ),
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -316,7 +324,8 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -332,15 +341,16 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
                                   fontSize: 20.0,
                                 ),
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -357,9 +367,7 @@ class _VisaTransferFormState extends State<VisaTransferForm>  with WidgetsBindin
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),

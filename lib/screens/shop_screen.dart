@@ -71,19 +71,21 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
   }
 
   _logOut() async {
+    _cleanPreferences();
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const SelectCountryScreen()));
+  }
+
+  _setLastPage() async {
     final prefs = await SharedPreferences.getInstance();
-    Object? nowScanning = prefs.get('isScanning');
-    if (nowScanning == false) {
-      _cleanPreferences();
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const SelectCountryScreen()));
-    }
+    await prefs.setString('lastPage', 'principalScreen');
   }
 
   @override
   void initState() {
     _getUserData();
     _getCountryScope();
+    _setLastPage();
     super.initState();
   }
 

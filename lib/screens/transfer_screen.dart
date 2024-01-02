@@ -4,7 +4,6 @@ import 'package:appllegagt/screens/recharge_screen.dart';
 import 'package:appllegagt/screens/select_country_screen.dart';
 import 'package:appllegagt/screens/shop_screen.dart';
 import 'package:appllegagt/screens/transfer/bank_transfer_form.dart';
-import 'package:appllegagt/screens/transfer/cootiza_transfer_form.dart';
 import 'package:appllegagt/screens/transfer/international_card_transfer.dart';
 import 'package:appllegagt/screens/transfer/local_transfer_form.dart';
 import 'package:appllegagt/screens/transfer/visa_transfer_form.dart';
@@ -74,19 +73,21 @@ class _TransferScreenState extends State<TransferScreen>
   }
 
   _logOut() async {
+    _cleanPreferences();
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const SelectCountryScreen()));
+  }
+
+  _setLastPage() async {
     final prefs = await SharedPreferences.getInstance();
-    Object? nowScanning = prefs.get('isScanning');
-    if (nowScanning == false) {
-      _cleanPreferences();
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const SelectCountryScreen()));
-    }
+    await prefs.setString('lastPage', 'principalScreen');
   }
 
   @override
   void initState() {
     _getUserData();
     _getCountryScope();
+    _setLastPage();
     super.initState();
   }
 
@@ -326,7 +327,7 @@ class _TransferScreenState extends State<TransferScreen>
                         OptionButton(
                           label: isUS
                               ? 'Hacia cuenta LLEGA en U.S.A.'
-                              : 'Hacia cuentas YPayme',
+                              : 'Hacia cuenta Llega',
                           onPress: () {
                             Navigator.push(
                               context,
@@ -372,20 +373,6 @@ class _TransferScreenState extends State<TransferScreen>
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           const InternationalCardTransfer(),
-                                    ),
-                                  );
-                                },
-                              )
-                            : const Text(''),
-                        isUS
-                            ? OptionButton(
-                                label: 'Hacia tarjeta LLEGA en GUATEMALA',
-                                onPress: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CooitzaTransferForm(),
                                     ),
                                   );
                                 },

@@ -3,12 +3,12 @@ import 'package:appllegagt/screens/procedure_screen.dart';
 import 'package:appllegagt/screens/recharge/ach_transfer_form.dart';
 import 'package:appllegagt/screens/recharge/akisi_cash_form.dart';
 import 'package:appllegagt/screens/recharge/card_load_cash_form.dart';
-import 'package:appllegagt/screens/recharge/card_load_pay_safe_form.dart';
 import 'package:appllegagt/screens/recharge/card_load_voucher_form.dart';
+import 'package:appllegagt/screens/recharge/pay_safe_options_screen.dart';
 import 'package:appllegagt/screens/recharge/ypayme_bank_deposit_form.dart';
+import 'package:appllegagt/screens/recharge/zelle_alert.dart';
 import 'package:appllegagt/screens/select_country_screen.dart';
 import 'package:appllegagt/screens/shop_screen.dart';
-import 'package:appllegagt/screens/recharge/bank_deposit_form.dart';
 import 'package:appllegagt/screens/transfer_screen.dart';
 import 'package:appllegagt/widgets/option_button.dart';
 import 'package:flutter/material.dart';
@@ -76,19 +76,21 @@ class _RechargeScreenState extends State<RechargeScreen>
   }
 
   _logOut() async {
+    _cleanPreferences();
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const SelectCountryScreen()));
+  }
+
+  _setLastPage() async {
     final prefs = await SharedPreferences.getInstance();
-    Object? nowScanning = prefs.get('isScanning');
-    if (nowScanning == false) {
-      _cleanPreferences();
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const SelectCountryScreen()));
-    }
+    await prefs.setString('lastPage', 'principalScreen');
   }
 
   @override
   void initState() {
     _getUserData();
     _getCountryScope();
+    _setLastPage();
     super.initState();
   }
 
@@ -321,7 +323,7 @@ class _RechargeScreenState extends State<RechargeScreen>
                     children: [
                       isGT
                           ? OptionButton(
-                              label: 'ACH',
+                              label: 'INFORMACIÓN DE\n SU TRANSFERENCIA',
                               onPress: () {
                                 Navigator.push(
                                   context,
@@ -353,12 +355,11 @@ class _RechargeScreenState extends State<RechargeScreen>
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            BankDepositForm()));
+                                        builder: (context) => ZelleAlert()));
                               },
                             )
                           : OptionButton(
-                              label: 'DEPOSITO BANCARIO',
+                              label: 'INFORMACIÓN DE\nSU DEPÓSITO',
                               onPress: () {
                                 Navigator.push(
                                     context,
@@ -372,10 +373,12 @@ class _RechargeScreenState extends State<RechargeScreen>
                               label: 'En efectivo (PaySafeCash)',
                               onPress: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const CardLoadPaySafeForm()));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const PaySafeOptionsScreen(),
+                                  ),
+                                );
                               },
                             )
                           : const Text(' '),

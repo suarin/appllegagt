@@ -3,6 +3,7 @@ import 'package:appllegagt/screens/issue/transaction_list.dart';
 import 'package:appllegagt/services/general_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CardTransactionsForm extends StatefulWidget {
   const CardTransactionsForm({Key? key}) : super(key: key);
@@ -11,7 +12,8 @@ class CardTransactionsForm extends StatefulWidget {
   _CardTransactionsFormState createState() => _CardTransactionsFormState();
 }
 
-class _CardTransactionsFormState extends State<CardTransactionsForm> with WidgetsBindingObserver {
+class _CardTransactionsFormState extends State<CardTransactionsForm>
+    with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
   final _passwordController = TextEditingController();
@@ -20,7 +22,7 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
   var screenWidth, screenHeight;
 
   //functions for dialogs
-    _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -33,7 +35,10 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -52,22 +57,22 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['Transacciones'] != null){
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['Transacciones'] != null) {
       var transactionList = CardTransactionsResponse.fromJson(json);
       Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context)=>TransactionList(transactionList: transactionList))
-      );
-
-    } else{
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  TransactionList(transactionList: transactionList)));
+    } else {
       String errorMessage = await SystemErrors.getSystemError(-1);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset Form
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
       _passwordController.text = '';
@@ -81,10 +86,12 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
     });
     await GeneralServices.getCardTransactions(_passwordController.text)
         .then((response) => {
-      if(response['Transacciones'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['Transacciones'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -101,6 +108,17 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
+  @override
+  void initState() {
+    _setLastPage();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
@@ -112,7 +130,7 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
       ),
       backgroundColor: const Color(0XFFAFBECC),
       body: Builder(
-        builder: (context)=> Form(
+        builder: (context) => Form(
           key: _formKey,
           child: SizedBox(
             child: SafeArea(
@@ -125,11 +143,11 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
                           child: TextFormField(
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Contraseña *',
+                              hintText: 'Web Pin *',
                             ),
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -137,7 +155,8 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -153,15 +172,16 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
                                   fontSize: 20.0,
                                 ),
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -178,9 +198,7 @@ class _CardTransactionsFormState extends State<CardTransactionsForm> with Widget
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AkisiCashForm extends StatefulWidget {
   const AkisiCashForm({Key? key}) : super(key: key);
@@ -7,12 +8,23 @@ class AkisiCashForm extends StatefulWidget {
   _AkisiCashFormState createState() => _AkisiCashFormState();
 }
 
-class _AkisiCashFormState extends State<AkisiCashForm>  with WidgetsBindingObserver{
-
+class _AkisiCashFormState extends State<AkisiCashForm>
+    with WidgetsBindingObserver {
   var screenWidth, screenHeight;
+
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
+  @override
+  void initState() {
+    _setLastPage();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -28,7 +40,7 @@ class _AkisiCashFormState extends State<AkisiCashForm>  with WidgetsBindingObser
               children: [
                 Container(
                   child: const Text(
-                    'Acuda a un comercio de Akisi, diga al cajero que quiere recargar su cuenta YPayme, dele su número de teléfono, y pague el valor de la recarga',
+                    'Acuda a un comercio de Akisi, diga al cajero que quiere recargar su cuenta Llega, dele su número de teléfono, y pague el valor de la recarga',
                     style: TextStyle(
                       color: Colors.black87,
                       fontSize: 24.0,

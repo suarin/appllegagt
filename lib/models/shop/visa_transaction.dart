@@ -3,18 +3,24 @@ class VisaTransaction {
   String? inserted;
   String? description;
   String? reference;
-  String? credit;
-  String? debit;
+  String? amount;
+  String? balance;
 
-  VisaTransaction({this.id, this.inserted, this.description, this.reference, this.credit, this.debit});
+  VisaTransaction(
+      {this.id,
+      this.inserted,
+      this.description,
+      this.reference,
+      this.amount,
+      this.balance});
 
   VisaTransaction.fromJson(Map<String, dynamic> json) {
     this.id = json["ID"];
     this.inserted = json["Inserted"];
     this.description = json["Description"];
     this.reference = json["Reference"];
-    this.credit = json["Credit"];
-    this.debit = json["Debit"];
+    this.amount = json["Amount"];
+    this.balance = json["Balance"];
   }
 
   Map<String, dynamic> toJson() {
@@ -23,8 +29,8 @@ class VisaTransaction {
     data["Inserted"] = this.inserted;
     data["Description"] = this.description;
     data["Reference"] = this.reference;
-    data["Credit"] = this.credit;
-    data["Debit"] = this.debit;
+    data["Amount"] = this.amount;
+    data["Balance"] = this.balance;
     return data;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:appllegagt/services/general_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WebPinForm extends StatefulWidget {
   const WebPinForm({Key? key}) : super(key: key);
@@ -9,8 +10,7 @@ class WebPinForm extends StatefulWidget {
   _WebPinFormState createState() => _WebPinFormState();
 }
 
-class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
-
+class _WebPinFormState extends State<WebPinForm> with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -21,8 +21,7 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
   var screenWidth, screenHeight;
 
   //functions for dialogs
-  _showSuccessResponse(BuildContext context){
-
+  _showSuccessResponse(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -43,9 +42,7 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
                             SizedBox(
                               child: Text(
                                 'Resultado',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
@@ -73,10 +70,9 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -89,7 +85,10 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -108,27 +107,24 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
       _showSuccessResponse(context);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset form
-  _resetForm(){
-
+  _resetForm() {
     setState(() {
       isProcessing = false;
-      _pin1Controller.text ='';
-      _pin2Controller.text='';
+      _pin1Controller.text = '';
+      _pin2Controller.text = '';
       _passwordController.text = '';
     });
-
   }
 
   //Execute registration
@@ -136,12 +132,15 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
     setState(() {
       isProcessing = true;
     });
-    await GeneralServices.getWebPinChange(_passwordController.text, _pin1Controller.text, _pin2Controller.text)
+    await GeneralServices.getWebPinChange(_passwordController.text,
+            _pin1Controller.text, _pin2Controller.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -158,9 +157,19 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
+  @override
+  void initState() {
+    _setLastPage();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
@@ -173,7 +182,7 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
       body: Builder(
         builder: (context) => Form(
           key: _formKey,
-          child:  SizedBox(
+          child: SizedBox(
             child: SafeArea(
               child: Container(
                 child: Stack(
@@ -181,15 +190,26 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
                     ListView(
                       children: [
                         Container(
-                          child:  TextFormField(
+                          child: const Text(
+                              'El PIN Web es firma electrónica para autorizar transacciones'),
+                          decoration: const BoxDecoration(
+                            color: Color(0XFFEFEFEF),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          height: 50.0,
+                          margin: const EdgeInsets.only(bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 10.0),
+                        ),
+                        Container(
+                          child: TextFormField(
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
-                                hintText: 'Nuevo PIN'
-                            ),
+                                hintText: 'Nuevo PIN'),
                             keyboardType: TextInputType.phone,
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -197,7 +217,8 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -211,11 +232,12 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
                             ),
                             keyboardType: TextInputType.phone,
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
-                              if(_pin1Controller.text != _pin2Controller.text){
+                              if (_pin1Controller.text !=
+                                  _pin2Controller.text) {
                                 return 'No coinciden los campos';
                               }
                             },
@@ -223,7 +245,8 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -233,11 +256,10 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
                           child: TextFormField(
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
-                                hintText: 'Contraseña'
-                            ),
+                                hintText: 'Web Pin Actual'),
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -245,7 +267,8 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -261,15 +284,16 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
                                   fontSize: 20.0,
                                 ),
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -286,9 +310,7 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),
@@ -309,6 +331,5 @@ class _WebPinFormState extends State<WebPinForm>  with WidgetsBindingObserver{
         ),
       ),
     );
-
   }
 }

@@ -1,4 +1,5 @@
 import 'package:appllegagt/models/general/login_success_response.dart';
+import 'package:appllegagt/screens/issue/cancel_account_web_view.dart';
 import 'package:appllegagt/screens/issue/password_form.dart';
 import 'package:appllegagt/screens/issue/web_pin_form.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,26 +13,25 @@ class AccountScreen extends StatefulWidget {
   _AccountScreenState createState() => _AccountScreenState();
 }
 
-class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObserver {
-
+class _AccountScreenState extends State<AccountScreen>
+    with WidgetsBindingObserver {
   var screenWidth, screenHeight;
 
   String clientName = '';
   String cardNo = '';
   String currency = '';
   String balance = '';
-  String userID ='';
+  String userID = '';
 
   _getUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    LoginSuccessResponse  loginSuccessResponse = LoginSuccessResponse(
+    LoginSuccessResponse loginSuccessResponse = LoginSuccessResponse(
         errorCode: 0,
         cHolderID: prefs.getInt('cHolderID'),
         userName: prefs.getString('userName'),
         cardNo: prefs.getString('cardNo'),
         currency: prefs.getString('currency'),
-        balance: prefs.getString('balance')
-    );
+        balance: prefs.getString('balance'));
     setState(() {
       clientName = loginSuccessResponse.userName.toString();
       cardNo = loginSuccessResponse.cardNo.toString();
@@ -41,13 +41,19 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
     });
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
   @override
-  void initState(){
+  void initState() {
     _getUserData();
+    _setLastPage();
     super.initState();
   }
-  Widget build(BuildContext context) {
 
+  Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
@@ -65,8 +71,10 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
                 child: SizedBox(
                   child: Container(
                     decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
-                        color: Color(0xFFE1E8EF),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0)),
+                      color: Color(0xFFE1E8EF),
                     ),
                   ),
                   height: screenHeight * 0.80,
@@ -84,7 +92,7 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
                   width: 150,
                 ),
                 top: 50.0,
-                left: (screenWidth - 150)/2,
+                left: (screenWidth - 150) / 2,
               ),
               Positioned(
                 child: SizedBox(
@@ -103,20 +111,19 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
                       ),
                       Container(
                         child: Row(
-                          children:  [
+                          children: [
                             const Icon(
                               Icons.credit_card,
                               color: Colors.black26,
                             ),
                             Container(
-                               child: Text(
-                                  cardNo,
-                                  style: const TextStyle(
-                                      color: Colors.black26,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 3.0
-                                  ),
-                                ),
+                              child: Text(
+                                cardNo,
+                                style: const TextStyle(
+                                    color: Colors.black26,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 3.0),
+                              ),
                               margin: const EdgeInsets.only(left: 30),
                             ),
                           ],
@@ -126,19 +133,18 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
                       ),
                       Container(
                         child: Row(
-                          children:  [
+                          children: [
                             const Icon(
                               Icons.monetization_on_rounded,
                               color: Colors.black26,
                             ),
                             Container(
-                              child:  Text(
+                              child: Text(
                                 '$currency $balance',
                                 style: const TextStyle(
                                     color: Colors.black26,
                                     fontWeight: FontWeight.bold,
-                                    letterSpacing: 3.0
-                                ),
+                                    letterSpacing: 3.0),
                               ),
                               margin: const EdgeInsets.only(left: 30),
                             ),
@@ -155,13 +161,12 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
                               color: Colors.black26,
                             ),
                             Container(
-                              child:  Text(
+                              child: Text(
                                 userID,
                                 style: const TextStyle(
                                     color: Colors.black26,
                                     fontWeight: FontWeight.bold,
-                                    letterSpacing: 3.0
-                                ),
+                                    letterSpacing: 3.0),
                               ),
                               margin: const EdgeInsets.only(left: 30),
                             ),
@@ -174,11 +179,9 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
                         child: TextButton(
                           child: const Text(
                             'Cambiar web PIN',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
+                            style: TextStyle(color: Colors.white),
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -189,8 +192,8 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
                         ),
                         decoration: const BoxDecoration(
                             color: Color(0xFF0E2238),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0))
-                        ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                         margin: const EdgeInsets.only(bottom: 5.0),
                         width: 325,
                       ),
@@ -198,11 +201,9 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
                         child: TextButton(
                           child: const Text(
                             'Cambiar contraseña',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
+                            style: TextStyle(color: Colors.white),
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -213,8 +214,31 @@ class _AccountScreenState extends State<AccountScreen>  with WidgetsBindingObser
                         ),
                         decoration: const BoxDecoration(
                             color: Color(0xFF0E2238),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0))
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
+                        margin: const EdgeInsets.only(bottom: 5.0),
+                        width: 325,
+                      ),
+                      Container(
+                        child: TextButton(
+                          child: const Text(
+                            'Cancelar Cuenta',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const CancelAccountWebView(),
+                              ),
+                            );
+                          },
                         ),
+                        decoration: const BoxDecoration(
+                            color: Color(0xFF0E2238),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                         margin: const EdgeInsets.only(bottom: 5.0),
                         width: 325,
                       ),

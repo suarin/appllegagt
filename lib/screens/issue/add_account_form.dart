@@ -10,8 +10,8 @@ class AddAccountForm extends StatefulWidget {
   _AddAccountFormState createState() => _AddAccountFormState();
 }
 
-class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObserver{
-
+class _AddAccountFormState extends State<AddAccountForm>
+    with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -25,14 +25,14 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
   //Load Country Scope
   _getCountryScope() async {
     final prefs = await SharedPreferences.getInstance();
-    String countryScope =  prefs.getString('countryScope')!;
-    if(countryScope=='GT'){
+    String countryScope = prefs.getString('countryScope')!;
+    if (countryScope == 'GT') {
       setState(() {
         isGT = true;
       });
     }
 
-    if(countryScope=='US'){
+    if (countryScope == 'US') {
       setState(() {
         isUS = true;
       });
@@ -40,8 +40,7 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
   }
 
   //functions for dialogs
-  _showSuccessResponse(BuildContext context, String response){
-
+  _showSuccessResponse(BuildContext context, String response) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -62,14 +61,13 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
                             SizedBox(
                               child: Text(
                                 'Resultado',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text('Ejecutado satisfactoriamente / Aceptado'),
+                              child: Text(
+                                  'Ejecutado satisfactoriamente / Aceptado'),
                               width: 150,
                             ),
                           ],
@@ -92,10 +90,9 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -108,7 +105,10 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -127,19 +127,18 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-
-      _showSuccessResponse(context, json['ErrorCode']);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
+      _showSuccessResponse(context, json['ErrorCode'].toString());
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset form
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
       _userController.text = "";
@@ -154,12 +153,15 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
       isProcessing = true;
     });
     final setMethod = isUS ? 'US' : 'GT';
-    await GeneralServices.getAddAccounts(setMethod, _userController.text,_firstNameController.text,_lastNameController.text)
+    await GeneralServices.getAddAccounts(setMethod, _userController.text,
+            _firstNameController.text, _lastNameController.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -176,14 +178,19 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
     _resetForm();
   }
 
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
 
   @override
-  void initState(){
+  void initState() {
     _getCountryScope();
+    _setLastPage();
     super.initState();
   }
-  Widget build(BuildContext context) {
 
+  Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     var screenHeight = MediaQuery.of(context).size.height;
 
@@ -209,8 +216,8 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
                               border: InputBorder.none,
                               hintText: 'Usuario *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -218,7 +225,8 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -230,8 +238,8 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
                               border: InputBorder.none,
                               hintText: 'Primer Nombre *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio *';
                               }
                             },
@@ -239,7 +247,8 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -251,8 +260,8 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
                               border: InputBorder.none,
                               hintText: 'Primer Apellido *',
                             ),
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -260,7 +269,8 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -276,15 +286,16 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
                                   fontSize: 20.0,
                                 ),
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -301,9 +312,7 @@ class _AddAccountFormState extends State<AddAccountForm> with WidgetsBindingObse
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),

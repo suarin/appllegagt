@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InternationalTransferForm extends StatefulWidget {
   const InternationalTransferForm({Key? key}) : super(key: key);
 
   @override
-  _InternationalTransferFormState createState() => _InternationalTransferFormState();
+  _InternationalTransferFormState createState() =>
+      _InternationalTransferFormState();
 }
 
-class _InternationalTransferFormState extends State<InternationalTransferForm> with WidgetsBindingObserver {
-
+class _InternationalTransferFormState extends State<InternationalTransferForm>
+    with WidgetsBindingObserver {
   var screenWidth, screenHeight;
+
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
+  @override
+  void initState() {
+    _setLastPage();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
@@ -100,7 +112,7 @@ class _InternationalTransferFormState extends State<InternationalTransferForm> w
                         fontSize: 20.0,
                       ),
                     ),
-                    onPressed: (){},
+                    onPressed: () {},
                   ),
                   decoration: const BoxDecoration(
                     color: Color(0XFF0E325F),

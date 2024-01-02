@@ -8,6 +8,7 @@ import 'package:appllegagt/services/recharge_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class CardLoadCashForm extends StatefulWidget {
   const CardLoadCashForm({Key? key}) : super(key: key);
 
@@ -15,8 +16,8 @@ class CardLoadCashForm extends StatefulWidget {
   _CardLoadCashFormState createState() => _CardLoadCashFormState();
 }
 
-class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindingObserver{
-
+class _CardLoadCashFormState extends State<CardLoadCashForm>
+    with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -30,48 +31,67 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
   bool isProcessing = false;
   bool visaCardsLoaded = false;
   CardLoadCashResponse cardLoadCashResponse = CardLoadCashResponse();
+  bool isGT = false;
+  bool isUS = false;
   var screenWidth, screenHeight;
+
+  //Load Country Scope
+  _getCountryScope() async {
+    final prefs = await SharedPreferences.getInstance();
+    String countryScope = prefs.getString('countryScope')!;
+    if (countryScope == 'GT') {
+      setState(() {
+        isGT = true;
+      });
+    }
+
+    if (countryScope == 'US') {
+      setState(() {
+        isUS = true;
+      });
+    }
+  }
 
   //function to Scan QR
   _scanQR(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isScanning',true);
+    await prefs.setBool('isScanning', true);
+    await prefs.setString('lastPage', 'qr');
     await QRScanner.scanQR().then((result) => {
-    setState(() {
-      _merchantController.text = result.toString();
-    }),
-    });
-
+          setState(() {
+            _merchantController.text = result.toString();
+          }),
+        });
   }
 
   //Get user data
   _getUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    LoginSuccessResponse  loginSuccessResponse = LoginSuccessResponse(
+    LoginSuccessResponse loginSuccessResponse = LoginSuccessResponse(
         errorCode: 0,
         cHolderID: prefs.getInt('cHolderID'),
         userName: prefs.getString('userName'),
         cardNo: prefs.getString('cardNo'),
         currency: prefs.getString('currency'),
-        balance: prefs.getString('balance')
-    );
+        balance: prefs.getString('balance'));
     setState(() {
       _virtualCardController.text = loginSuccessResponse.cardNo.toString();
     });
   }
+
   //function to obtain Visa Cards for picker
   _getVirtualCards() async {
     await GeneralServices.getVirtualCards().then((list) => {
-      setState(() {
-        visaCardsResponse = VisaCardsResponse.fromJson(list);
-        visaCardsLoaded = true;
-      })
-    });
+          setState(() {
+            visaCardsResponse = VisaCardsResponse.fromJson(list);
+            visaCardsLoaded = true;
+          })
+        });
   }
 
   //functions for dialogs
-  _showSuccessResponse(BuildContext context, CardLoadCashResponse cardLoadCashResponse){
-
+  _showSuccessResponse(
+      BuildContext context, CardLoadCashResponse cardLoadCashResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -92,16 +112,13 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                             const SizedBox(
                               child: Text(
                                 'Balance',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
                               child: Text(
-                                'USD ${cardLoadCashResponse.balance.toString()}'
-                              ),
+                                  '${isUS ? "USD " : "Q "} ${cardLoadCashResponse.balance.toString()}'),
                               width: 150,
                             ),
                           ],
@@ -111,16 +128,13 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                             const SizedBox(
                               child: Text(
                                 'Autorizacion',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
                               child: Text(
-                                  'USD ${cardLoadCashResponse.authno.toString()}'
-                              ),
+                                  '${isUS ? "USD " : "Q "} ${cardLoadCashResponse.authno.toString()}'),
                               width: 150,
                             ),
                           ],
@@ -143,10 +157,9 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -159,7 +172,10 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -178,27 +194,27 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-
-      CardLoadCashResponse  cardLoadCashResponse = CardLoadCashResponse.fromJson(json);
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
+      CardLoadCashResponse cardLoadCashResponse =
+          CardLoadCashResponse.fromJson(json);
       _showSuccessResponse(context, cardLoadCashResponse);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset form
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
-      _mobileController.text='';
-      _merchantController.text ='';
+      _mobileController.text = '';
+      _merchantController.text = '';
       _passwordController.text = '';
-      _amountController.text ='';
-      _virtualCardController.text ='';
+      _amountController.text = '';
+      _virtualCardController.text = '';
     });
   }
 
@@ -207,12 +223,19 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
     setState(() {
       isProcessing = true;
     });
-    await RechargeServices.getCardLoadCash(_merchantController.text,_passwordController.text,_virtualCardController.text,_mobileController.text, _amountController.text)
+    await RechargeServices.getCardLoadCash(
+            _merchantController.text,
+            _passwordController.text,
+            _virtualCardController.text,
+            _mobileController.text,
+            _amountController.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -230,11 +253,13 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
   }
 
   @override
-  void initState(){
+  void initState() {
     _getVirtualCards();
     _getUserData();
+    _getCountryScope();
     super.initState();
   }
+
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
@@ -268,8 +293,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                                     ),
                                   ),
                                   keyboardType: TextInputType.phone,
-                                  validator: (value){
-                                    if(value == null || value.isEmpty){
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
                                       return 'Campo obligatorio';
                                     }
                                   },
@@ -279,8 +304,9 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                               ),
                               SizedBox(
                                 child: IconButton(
-                                  icon: Image.asset('images/icons/qr_scan_icon.png'),
-                                  onPressed: (){
+                                  icon: Image.asset(
+                                      'images/icons/qr_scan_icon.png'),
+                                  onPressed: () {
                                     _scanQR(context);
                                   },
                                 ),
@@ -291,7 +317,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -307,8 +334,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                               ),
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -316,7 +343,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -332,8 +360,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                               ),
                             ),
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -341,7 +369,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -357,8 +386,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                               ),
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -366,7 +395,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -382,8 +412,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                               ),
                             ),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -391,14 +421,15 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
                           padding: const EdgeInsets.only(left: 10.0),
                         ),
                         Visibility(
-                          child:  Container(
+                          child: Container(
                             child: TextButton(
                               child: const Text(
                                 'Solicitar',
@@ -408,14 +439,15 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                                 ),
                               ),
                               onPressed: () {
-                                if(_formKey.currentState!.validate()){
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -432,9 +464,7 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>  with WidgetsBindin
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),

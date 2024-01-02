@@ -6,15 +6,17 @@ import 'package:intl/intl.dart';
 
 class TransactionList extends StatefulWidget {
   final CardTransactionsResponse? transactionList;
-  const TransactionList({Key? key, @required this.transactionList}) : super(key: key);
+  const TransactionList({Key? key, @required this.transactionList})
+      : super(key: key);
 
   @override
-  _TransactionListState createState(){
-    return  _TransactionListState(transactionList: this.transactionList);
+  _TransactionListState createState() {
+    return _TransactionListState(transactionList: this.transactionList);
   }
 }
 
-class _TransactionListState extends State<TransactionList>  with WidgetsBindingObserver{
+class _TransactionListState extends State<TransactionList>
+    with WidgetsBindingObserver {
   final CardTransactionsResponse? transactionList;
   _TransactionListState({Key? key, @required this.transactionList});
   var screenWidth, screenHeight;
@@ -25,8 +27,8 @@ class _TransactionListState extends State<TransactionList>  with WidgetsBindingO
   //Load Country Scope
   _getCountryScope() async {
     final prefs = await SharedPreferences.getInstance();
-    String countryScope =  prefs.getString('countryScope')!;
-    if(countryScope=='GT'){
+    String countryScope = prefs.getString('countryScope')!;
+    if (countryScope == 'GT') {
       setState(() {
         isGT = true;
         titleApp = 'yPayme';
@@ -34,7 +36,7 @@ class _TransactionListState extends State<TransactionList>  with WidgetsBindingO
       });
     }
 
-    if(countryScope=='US'){
+    if (countryScope == 'US') {
       setState(() {
         isUS = true;
         titleApp = 'BGP';
@@ -42,11 +44,19 @@ class _TransactionListState extends State<TransactionList>  with WidgetsBindingO
       });
     }
   }
+
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
   @override
-  void initState(){
+  void initState() {
     _getCountryScope();
+    _setLastPage();
     super.initState();
   }
+
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
@@ -58,16 +68,16 @@ class _TransactionListState extends State<TransactionList>  with WidgetsBindingO
       ),
       backgroundColor: const Color(0XFFAFBECC),
       body: Builder(
-        builder: (context)=>SafeArea(
+        builder: (context) => SafeArea(
           child: ListView.builder(
-            padding: EdgeInsets.only(left: 10.0,right: 10.0),
+            padding: EdgeInsets.only(left: 10.0, right: 10.0),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemCount: transactionList!.transactions!.length,
-            itemBuilder: (context,index){
+            itemBuilder: (context, index) {
               Transaction transaction = transactionList!.transactions![index];
               return Container(
-                padding: EdgeInsets.only(top: 10.0,bottom: 10.0),
+                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 width: 300,
                 child: Column(
                   children: [
@@ -75,29 +85,25 @@ class _TransactionListState extends State<TransactionList>  with WidgetsBindingO
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          transaction.credito! > 0 ?
-                          Text(
-                            '+$currencyApp ${f.format(transaction.credito)}',
-                            style: const TextStyle(
-                                color: Colors.green,
-                                fontFamily: 'NanumGothic Bold',
-                                fontSize: 20.0
-                            ),
-                          ):
-                          Text(
-                            '$currencyApp ${f.format(transaction.debito)}',
-                            style: const TextStyle(
-                                color: Colors.red,
-                                fontFamily: 'NanumGothic Bold',
-                                fontSize: 20.0
-                            ),
-                          ),
+                          transaction.credito! > 0
+                              ? Text(
+                                  '+$currencyApp ${f.format(transaction.credito)}',
+                                  style: const TextStyle(
+                                      color: Colors.green,
+                                      fontFamily: 'NanumGothic Bold',
+                                      fontSize: 20.0),
+                                )
+                              : Text(
+                                  '$currencyApp ${f.format(transaction.debito)}',
+                                  style: const TextStyle(
+                                      color: Colors.red,
+                                      fontFamily: 'NanumGothic Bold',
+                                      fontSize: 20.0),
+                                ),
                           Text(
                             '${transaction.fecha}',
                             style: const TextStyle(
-                                fontFamily: 'NanumGothic Bold',
-                                fontSize: 16.0
-                            ),
+                                fontFamily: 'NanumGothic Bold', fontSize: 16.0),
                           )
                         ],
                       ),
@@ -113,9 +119,7 @@ class _TransactionListState extends State<TransactionList>  with WidgetsBindingO
                               style: const TextStyle(
                                   fontFamily: 'NanumGothic Bold',
                                   fontSize: 16.0,
-                                  fontWeight: FontWeight.bold
-                              ),
-
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -132,9 +136,7 @@ class _TransactionListState extends State<TransactionList>  with WidgetsBindingO
                               style: const TextStyle(
                                   fontFamily: 'NanumGothic Bold',
                                   fontSize: 16.0,
-                                  fontWeight: FontWeight.bold
-                              ),
-
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],

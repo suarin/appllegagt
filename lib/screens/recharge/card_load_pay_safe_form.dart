@@ -1,7 +1,8 @@
-import 'package:appllegagt/screens/recharge/paysafecash_web_view.dart';
+import 'package:appllegagt/models/recharge/load_pay_safe_response.dart';
 import 'package:appllegagt/services/recharge_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CardLoadPaySafeForm extends StatefulWidget {
   const CardLoadPaySafeForm({Key? key}) : super(key: key);
@@ -10,16 +11,71 @@ class CardLoadPaySafeForm extends StatefulWidget {
   _CardLoadPaySafeFormState createState() => _CardLoadPaySafeFormState();
 }
 
-class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm> with WidgetsBindingObserver {
+class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm>
+    with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
   final _amountController = TextEditingController();
-  bool isProcessing = false;
-  String paySafeUrl= '';
-  var screenWidth, screenHeight;
+  LoadPaySafeResponse? loadPaySafeResponse;
+  bool _processingEnabled = false;
+  bool _depositRequestButtonEnabled = true;
+  String paySafeUrl = '';
 
 //functions for dialogs
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showSuccessResponse(
+      BuildContext context, LoadPaySafeResponse loadPaySafeResponse) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200,
+          color: Colors.greenAccent,
+          child: Center(
+            child: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            const SizedBox(
+                              child: Text(
+                                'Token',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              width: 150,
+                            ),
+                            SizedBox(
+                              child: Text(loadPaySafeResponse.Token.toString()),
+                              width: 150,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    margin: const EdgeInsets.only(left: 40),
+                  ),
+                  ElevatedButton(
+                    child: const Text('Cerrar'),
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      primary: const Color(0XFF0E325F),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    _resetForm();
+  }
+
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -32,7 +88,10 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm> with WidgetsB
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -51,45 +110,46 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm> with WidgetsB
   }
 
   //Check response
-  _checkResponse(BuildContext context, String json) async{
-    if(json.contains('https://customer.cc.at.paysafecard.com/rest/payment/panel?')){
+  _checkResponse(BuildContext context, dynamic json) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (json['ErrorCode'] == 0) {
+      loadPaySafeResponse = LoadPaySafeResponse.fromJson(json);
+      prefs.setString('paySafeAmount', _amountController.text);
+      prefs.setString('paySafeToken', loadPaySafeResponse!.Token.toString());
+      setState(() {
+        _processingEnabled = false;
+        _depositRequestButtonEnabled = true;
+      });
 
-      const start = "https://customer.cc.at.paysafecard.com/rest/payment/panel?";
-
-      final startIndex = json.indexOf(start);
-      paySafeUrl = json.substring(startIndex, json.length);
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PaySafeCashWebView(paySafeUrl: paySafeUrl)
-        ),
-      );
-    } else{
+      _showSuccessResponse(context, loadPaySafeResponse!);
+    } else {
       String errorMessage = await SystemErrors.getSystemError(0);
       _showErrorResponse(context, errorMessage);
+      _resetForm();
     }
   }
 
   //Reset form
-  _resetForm(){
+  _resetForm() {
     setState(() {
-      isProcessing = false;
-      _amountController.text ='';
+      _processingEnabled = false;
+      _amountController.text = '';
+      _depositRequestButtonEnabled = true;
     });
   }
 
   //Execute registration
   _executeTransaction(BuildContext context) async {
     setState(() {
-      isProcessing = true;
+      _processingEnabled = true;
+      _depositRequestButtonEnabled = false;
     });
     await RechargeServices.getLoadPaySafe(_amountController.text)
         .then((response) => {
-      if(response.contains('https://customer.cc.at.paysafecard.com/rest/payment/panel?')){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {_checkResponse(context, response)}
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -103,16 +163,22 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm> with WidgetsB
       );
       _resetForm();
     });
-    _resetForm();
+  }
+
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
   }
 
   @override
   void initState() {
+    _setLastPage();
     super.initState();
   }
+
   Widget build(BuildContext context) {
-    screenWidth = MediaQuery.of(context).size.width;
-    screenHeight = MediaQuery.of(context).size.height;
+    var screenWidth = MediaQuery.of(context).size.width;
+    var screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Recarga PaySafe'),
@@ -137,11 +203,10 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm> with WidgetsB
                                 hintText: 'Monto *',
                                 errorStyle: TextStyle(
                                   fontSize: 8,
-                                )
-                            ),
+                                )),
                             keyboardType: TextInputType.phone,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
@@ -149,35 +214,37 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm> with WidgetsB
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0, top: 10.0),
                           padding: const EdgeInsets.only(left: 10.0),
                         ),
-                       Visibility(
-                         child:  Container(
-                           child: TextButton(
-                             child: const Text(
-                               'Recargar',
-                               style: TextStyle(
-                                 color: Colors.white,
-                                 fontSize: 20.0,
-                               ),
-                             ),
-                             onPressed: () {
-                               _executeTransaction(context);
-                             },
-                           ),
-                           decoration: const BoxDecoration(
-                             color: Color(0XFF0E325F),
-                             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                           ),
-                           width: screenWidth,
-                           margin: const EdgeInsets.only(bottom: 5.0),
-                         ),
-                         visible: !isProcessing,
-                       ),
+                        Visibility(
+                          child: Container(
+                            child: TextButton(
+                              child: const Text(
+                                'Recargar',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20.0,
+                                ),
+                              ),
+                              onPressed: () {
+                                _executeTransaction(context);
+                              },
+                            ),
+                            decoration: const BoxDecoration(
+                              color: Color(0XFF0E325F),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            width: screenWidth,
+                            margin: const EdgeInsets.only(bottom: 5.0),
+                          ),
+                          visible: _depositRequestButtonEnabled,
+                        ),
                       ],
                     ),
                     Positioned(
@@ -189,14 +256,12 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm> with WidgetsB
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),
                         ),
-                        visible: isProcessing,
+                        visible: _processingEnabled,
                       ),
                       top: screenHeight - 180.0,
                     ),
@@ -214,4 +279,3 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm> with WidgetsB
     );
   }
 }
-

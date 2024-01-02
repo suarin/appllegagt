@@ -15,6 +15,9 @@ class ApiResources {
   //Password change
   static const String passwordChangeUri = 'customer/password';
 
+  //Recover Access
+  static const String customerAccessUri = 'customer/recovery_access';
+
   //Visa request
   static const String visaRequestUri = 'card/visarequest';
 
@@ -73,6 +76,10 @@ class ApiResources {
   //Recharge
   //Deposit Zelle: This method is used to load the customer account/card from domestic bank account
   static const String loadBkUri = 'Card/Loadbk';
+
+  //Zelle transfer information request
+  static const String reqZelleInfoUri = 'card/reqZelleInfo';
+
   //Merchant with voucher
   static const String cardLoadVoucherUri = 'merchant/card_loadvoucher';
 
@@ -81,6 +88,9 @@ class ApiResources {
 
   //Paysafe
   static const String loadPaySafeUri = 'card/loadpaysafe';
+
+  //PaySafeDepositRequest
+  static const String loadPaySafeDepositUri = 'card/reqPaySafe';
 
   //Purchase
   //Qr Purchase

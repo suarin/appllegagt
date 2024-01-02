@@ -1,8 +1,9 @@
 import 'package:appllegagt/services/general_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PasswordForm extends StatefulWidget  with WidgetsBindingObserver{
+class PasswordForm extends StatefulWidget with WidgetsBindingObserver {
   const PasswordForm({Key? key}) : super(key: key);
 
   @override
@@ -10,7 +11,6 @@ class PasswordForm extends StatefulWidget  with WidgetsBindingObserver{
 }
 
 class _PasswordFormState extends State<PasswordForm> {
-
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
@@ -19,10 +19,8 @@ class _PasswordFormState extends State<PasswordForm> {
   var screenWidth, screenHeight;
   bool isProcessing = false;
 
-
   //functions for dialogs
-  _showSuccessResponse(BuildContext context){
-
+  _showSuccessResponse(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -43,9 +41,7 @@ class _PasswordFormState extends State<PasswordForm> {
                             SizedBox(
                               child: Text(
                                 'Resultado',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
@@ -73,10 +69,9 @@ class _PasswordFormState extends State<PasswordForm> {
         );
       },
     );
-
   }
 
-  _showErrorResponse(BuildContext context, String errorMessage){
+  _showErrorResponse(BuildContext context, String errorMessage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -89,7 +84,10 @@ class _PasswordFormState extends State<PasswordForm> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
-                  child: Text(errorMessage, style: const TextStyle(color: Colors.white),),
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   margin: const EdgeInsets.only(left: 40.0),
                 ),
                 ElevatedButton(
@@ -108,23 +106,22 @@ class _PasswordFormState extends State<PasswordForm> {
   }
 
   //Check response
-  _checkResponse(BuildContext context, dynamic json) async{
-    if(json['ErrorCode'] == 0){
-
+  _checkResponse(BuildContext context, dynamic json) async {
+    if (json['ErrorCode'] == 0) {
       _showSuccessResponse(context);
-
-    } else{
-      String errorMessage = await SystemErrors.getSystemError(json['ErrorCode']);
+    } else {
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
   //Reset fomr
-  _resetForm(){
+  _resetForm() {
     setState(() {
       isProcessing = false;
       _pin2Controller.text = '';
-      _pin1Controller.text ='';
+      _pin1Controller.text = '';
     });
   }
 
@@ -133,12 +130,15 @@ class _PasswordFormState extends State<PasswordForm> {
     setState(() {
       isProcessing = true;
     });
-    await GeneralServices.getPasswordChange(_pin1Controller.text, _pin2Controller.text)
+    await GeneralServices.getPasswordChange(
+            _pin1Controller.text, _pin2Controller.text)
         .then((response) => {
-      if(response['ErrorCode'] != null){
-        _checkResponse(context, response),
-      }
-    }).catchError((error){
+              if (response['ErrorCode'] != null)
+                {
+                  _checkResponse(context, response),
+                }
+            })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -152,12 +152,22 @@ class _PasswordFormState extends State<PasswordForm> {
       );
       _resetForm();
     });
-   _resetForm();
+    _resetForm();
+  }
+
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
+  }
+
+  @override
+  void initState() {
+    _setLastPage();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
@@ -169,7 +179,7 @@ class _PasswordFormState extends State<PasswordForm> {
       backgroundColor: const Color(0XFFAFBECC),
       key: scaffoldStateKey,
       body: Builder(
-        builder: (context)=> Form(
+        builder: (context) => Form(
           key: _formKey,
           child: SizedBox(
             child: SafeArea(
@@ -179,22 +189,12 @@ class _PasswordFormState extends State<PasswordForm> {
                     ListView(
                       children: [
                         Container(
-                          child:  TextFormField(
-                            decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Nueva contraseña'
-                            ),
-                            obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
-                                return 'Campo obligatorio';
-                              }
-                            },
-                            controller: _pin1Controller,
-                          ),
+                          child: const Text(
+                              'Mínimo 4 dígitos \n Máximo 8 caracteres'),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
@@ -204,14 +204,48 @@ class _PasswordFormState extends State<PasswordForm> {
                           child: TextFormField(
                             decoration: const InputDecoration(
                                 border: InputBorder.none,
-                                hintText: 'Repetir nueva contraseña'
-                            ),
+                                hintText: 'Nueva contraseña'),
                             obscureText: true,
-                            validator: (value){
-                              if(value == null || value.isEmpty){
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
-                              if(_pin1Controller.text != _pin2Controller.text){
+                              if (value.length < 4) {
+                                return 'Mínimo 4 caracteres';
+                              }
+                              if (value.length > 8) {
+                                return 'Máximo 8 caracteres';
+                              }
+                            },
+                            controller: _pin1Controller,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Color(0XFFEFEFEF),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          height: 50.0,
+                          margin: const EdgeInsets.only(bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 10.0),
+                        ),
+                        Container(
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Repetir nueva contraseña'),
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Campo obligatorio';
+                              }
+                              if (value.length < 4) {
+                                return 'Mínimo 4 caracteres';
+                              }
+                              if (value.length > 8) {
+                                return 'Máximo 8 caracteres';
+                              }
+                              if (_pin1Controller.text !=
+                                  _pin2Controller.text) {
                                 return 'Constraseña no coincide';
                               }
                             },
@@ -219,14 +253,15 @@ class _PasswordFormState extends State<PasswordForm> {
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           height: 50.0,
                           margin: const EdgeInsets.only(bottom: 5.0),
                           padding: const EdgeInsets.only(left: 10.0),
                         ),
                         Visibility(
-                          child:   Container(
+                          child: Container(
                             child: TextButton(
                               child: const Text(
                                 'Cambiar',
@@ -235,15 +270,16 @@ class _PasswordFormState extends State<PasswordForm> {
                                   fontSize: 20.0,
                                 ),
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
                                 }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -260,9 +296,7 @@ class _PasswordFormState extends State<PasswordForm> {
                               color: Colors.white,
                             ),
                           ),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
+                          decoration: const BoxDecoration(color: Colors.grey),
                           height: 50.0,
                           width: screenWidth,
                           padding: const EdgeInsets.all(10.0),
@@ -283,6 +317,5 @@ class _PasswordFormState extends State<PasswordForm> {
         ),
       ),
     );
-
   }
 }
