@@ -1,44 +1,30 @@
-import 'package:appllegagt/models/general/virtual_card_balance_response.dart';
-import 'package:appllegagt/models/general/virtual_card.dart';
-import 'package:appllegagt/models/general/virtual_cards_response.dart';
+import 'package:appllegagt/models/shop/virtual_card_request_response.dart';
+import 'package:appllegagt/models/general/authorization_response.dart';
+import 'package:appllegagt/screens/issue/virtual_card_screen.dart';
 import 'package:appllegagt/services/general_services.dart';
+import 'package:appllegagt/services/purchase_service.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class VirtualCardBalanceForm extends StatefulWidget {
-  const VirtualCardBalanceForm({Key? key}) : super(key: key);
+class VirtualCardIssueForm extends StatefulWidget {
+  const VirtualCardIssueForm({Key? key}) : super(key: key);
 
   @override
-  _VirtualCardBalanceFormState createState() => _VirtualCardBalanceFormState();
+  _VirtualCardIssueFormState createState() => _VirtualCardIssueFormState();
 }
 
-class _VirtualCardBalanceFormState extends State<VirtualCardBalanceForm>
+class _VirtualCardIssueFormState extends State<VirtualCardIssueForm>
     with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
-  final _virtualCardController = TextEditingController();
-  VirtualCardsResponse? cards;
-  bool virtualCardsLoaded = false;
+  final _passwordController = TextEditingController();
   bool isProcessing = false;
-  VirtualCard? selectedVirtualCard;
-  VirtualCardBalanceResponse? virtualCardBalanceResponse;
   var screenWidth, screenHeight;
-
-  //function to obtain Virtual Cards for picker
-  _getVirtualCards() async {
-    await GeneralServices.getVirtualCards().then((list) => {
-          setState(() {
-            cards = VirtualCardsResponse.fromJson(list);
-            virtualCardsLoaded = true;
-          })
-        });
-  }
-
   //functions for dialogs
-  _showSuccessResponse(BuildContext context,
-      VirtualCardBalanceResponse virtualCardBalanceResponse) {
+  _showSuccessResponse(
+      BuildContext context, AuthorizationResponse authorizationResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -56,16 +42,16 @@ class _VirtualCardBalanceFormState extends State<VirtualCardBalanceForm>
                       children: [
                         Row(
                           children: [
-                            const SizedBox(
-                              child: Text(
-                                'Balance',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              width: 150,
-                            ),
                             SizedBox(
-                              child: Text(virtualCardBalanceResponse.balance
-                                  .toString()),
+                              child: Text(
+                                'Authorization' ,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                width: 150,
+                              ),
+                            SizedBox(
+                              child:
+                              Text(authorizationResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -127,36 +113,42 @@ class _VirtualCardBalanceFormState extends State<VirtualCardBalanceForm>
   //Check response
   _checkResponse(BuildContext context, dynamic json) async {
     if (json['ErrorCode'] == 0) {
-      VirtualCardBalanceResponse virtualCardBalanceResponse =
-          VirtualCardBalanceResponse.fromJson(json);
-      _showSuccessResponse(context, virtualCardBalanceResponse);
+      VirtualCardRequestResponse virtualCardRequestResponse =
+      VirtualCardRequestResponse.fromJson(json);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => VirtualCardScreen(
+                  virtualCardRequestResponse: virtualCardRequestResponse)));
     } else {
       String errorMessage =
-          await SystemErrors.getSystemError(json['ErrorCode']);
+      await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
 
-  //Reset Form
+  //Reset form
   _resetForm() {
     setState(() {
       isProcessing = false;
-      _virtualCardController.text = '';
+      _passwordController.text = '';
     });
   }
 
-  //Execute transaction
+  //Execute registration
   _executeTransaction(BuildContext context) async {
     setState(() {
       isProcessing = true;
     });
-    await GeneralServices.getVirtualCardBalance(selectedVirtualCard!.cardNo.toString())
+    await PurchaseService.getVirtualCardIssue(
+      _passwordController.text,
+    )
         .then((response) => {
-              if (response['ErrorCode'] != null)
-                {
-                  _checkResponse(context, response),
-                }
-            })
+      if (response['ErrorCode'] != null)
+        {
+          _checkResponse(context, response),
+        }
+    })
         .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -174,28 +166,27 @@ class _VirtualCardBalanceFormState extends State<VirtualCardBalanceForm>
     _resetForm();
   }
 
-  _setLastPage() async {
+  _offScanning() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('lastPage', 'principalScreen');
+    await prefs.setBool('isScanning', false);
   }
 
   @override
   void initState() {
-    _getVirtualCards();
-    _setLastPage();
+    _offScanning();
     super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Solicitar balance Tarjeta Virtual'),
+        title: const Text('Tarjeta Virtual'),
         backgroundColor: const Color(0XFF0E325F),
       ),
       backgroundColor: const Color(0XFFAFBECC),
-      key: scaffoldStateKey,
       body: Builder(
         builder: (context) => Form(
           key: _formKey,
@@ -206,88 +197,49 @@ class _VirtualCardBalanceFormState extends State<VirtualCardBalanceForm>
                   children: [
                     ListView(
                       children: [
-                        virtualCardsLoaded
-                            ? Container(
-                                child: DropdownButton<VirtualCard>(
-                                  hint: const Text(
-                                    'Seleccionar Tarjeta',
-                                    style: TextStyle(
-                                      color: Colors.black26,
-                                      fontFamily: 'VarelaRoundRegular',
-                                    ),
-                                  ),
-                                  value: selectedVirtualCard,
-                                  onChanged: (VirtualCard? value) {
-                                    setState(() {
-                                      selectedVirtualCard = value;
-                                    });
-                                  },
-                                  items: cards!.virtualCards!
-                                      .map((VirtualCard virtualCard) {
-                                    return DropdownMenuItem<VirtualCard>(
-                                      value: virtualCard,
-                                      child: Container(
-                                        padding:
-                                            const EdgeInsets.only(left: 5.0),
-                                        width: 250,
-                                        child: Text(
-                                          '${virtualCard.cardNo}',
-                                          style: const TextStyle(
-                                            color: Colors.black,
-                                            fontFamily: 'VarelaRoundRegular',
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.black),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(30.0))),
-                                margin: const EdgeInsets.only(bottom: 15.0),
-                                padding: const EdgeInsets.only(left: 10.0),
-                                width: 300,
-                              )
-                            : Container(
-                                child: const TextField(
-                                  decoration: InputDecoration(
-                                      label: Text(
-                                        'Sin Tarjetas',
-                                        style: TextStyle(
-                                          color: Colors.black26,
-                                          fontFamily: 'VarelaRoundRegular',
-                                        ),
-                                      ),
-                                      border: InputBorder.none),
-                                  keyboardType: TextInputType.phone,
-                                ),
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.black),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(30.0))),
-                                margin: const EdgeInsets.only(bottom: 15.0),
-                                padding: const EdgeInsets.only(left: 10.0),
-                                width: 300,
-                              ),
+                        Container(
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Web Pin *',
+                            ),
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Campo obligatorio';
+                              }
+                            },
+                            controller: _passwordController,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Color(0XFFEFEFEF),
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          height: 50.0,
+                          margin: const EdgeInsets.only(bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 10.0),
+                        ),
                         Visibility(
                           child: Container(
                             child: TextButton(
                               child: const Text(
-                                'Solicitar',
+                                'Enviar',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                 ),
                               ),
                               onPressed: () {
+                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
+                                }
                               },
                             ),
                             decoration: const BoxDecoration(
                               color: Color(0XFF0E325F),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
+                              BorderRadius.all(Radius.circular(10.0)),
                             ),
                             width: screenWidth,
                           ),
@@ -311,7 +263,7 @@ class _VirtualCardBalanceFormState extends State<VirtualCardBalanceForm>
                         ),
                         visible: isProcessing,
                       ),
-                      top: screenHeight - 180.0,
+                      top: screenHeight - 130.0,
                     ),
                   ],
                 ),

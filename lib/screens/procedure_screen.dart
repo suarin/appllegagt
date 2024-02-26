@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'issue/bills_screen.dart';
 import 'issue/virtual_card_balance_form.dart';
 import 'issue/visa_balance_form.dart';
-import 'issue/visa_request_form.dart';
+
 import 'package:appllegagt/widgets/option_button.dart';
 
 class ProcedureScreen extends StatefulWidget {
@@ -102,7 +102,7 @@ class _ProcedureScreenState extends State<ProcedureScreen>
 
     return WillPopScope(
       child: Scaffold(
-        backgroundColor: const Color(0xFF0E2238),
+        backgroundColor: const Color(0xFF42A5F5),
         body: SizedBox(
           child: SafeArea(
             child: Stack(
@@ -122,26 +122,31 @@ class _ProcedureScreenState extends State<ProcedureScreen>
                           top: 25.0,
                         ),
                         Positioned(
-                            child: Text(
-                              cardNo,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                letterSpacing: 5,
-                              ),
+                          child: Text(
+                            // Format cardNo to "XXXX XXXX XXXX XXXX"
+                            '${cardNo.substring(0, 4)} ${cardNo.substring(4, 8)} ${cardNo.substring(8, 12)} ${cardNo.substring(12)}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              letterSpacing: 5,
                             ),
-                            left: 25.0,
-                            top: 75.0),
+                          ),
+                          left: 25.0,
+                          top: 75.0,
+                        ),
                         Positioned(
-                            child: Text(
-                              '$currency $balance',
-                              style: const TextStyle(color: Colors.white),
+                          child: Text(
+                            '$currency $balance',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22.0,
                             ),
-                            left: 15.0,
-                            top: 140.0),
+                          ),
+                          left: 15.0,
+                          top: 140.0,
+                        ),
                         Positioned(
                           child: SizedBox(
-                            child: Image.asset(
-                                'images/llegelogoblanco154x154.png'),
+                            child: Image.asset('images/llegelogoblanco154x154.png'),
                             height: 100.0,
                             width: 100.0,
                           ),
@@ -347,17 +352,6 @@ class _ProcedureScreenState extends State<ProcedureScreen>
                               MaterialPageRoute(
                                 builder: (context) =>
                                     const CardTransactionsForm(),
-                              ),
-                            );
-                          },
-                        ),
-                        OptionButton(
-                          label: 'Solicitar Tarjeta Visa',
-                          onPress: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const VisaRequestForm(),
                               ),
                             );
                           },

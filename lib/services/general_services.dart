@@ -304,8 +304,6 @@ class GeneralServices {
     var merchantId = await reqMerchantID();
     var token = await reqToken();
     var baseUrl = await getBaseUrl();
-    //get CHolderID
-    var reqCHolderID = await getCHolderID();
     //Prepare Uri
     var url = Uri.parse(
         '${baseUrl + ApiResources.visaBalanceUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqVisaCardNo=$reqVisaCardNo');
@@ -400,15 +398,14 @@ class GeneralServices {
     }
   }
 
-  static Future<dynamic> getVirtualCardBalance(String reqVisaCardNo) async {
+  static Future<dynamic> getVirtualCardBalance(String reqVirtualCardNo) async {
     var merchantId = await reqMerchantID();
     var token = await reqToken();
     var baseUrl = await getBaseUrl();
-    //get CHolderID
-    var reqCHolderID = await getCHolderID();
+
     //Prepare Uri
     var url = Uri.parse(
-        '${baseUrl + ApiResources.virtualCardBalanceUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqVirtualCardNo=$reqVisaCardNo');
+        '${baseUrl + ApiResources.virtualCardBalanceUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqVirtualCardNo=$reqVirtualCardNo');
     //Send card transfer
     http.Response response;
     try {
@@ -420,7 +417,7 @@ class GeneralServices {
     }
     //validates that http response is ok code 200
     if (response.statusCode == 200) {
-      //if is ok return the decoded body of response, returns: CHolderID, UserName, CardNo, Currency and Balance
+      //if is ok return the decoded body of response, returns: Balance
       const codec = Windows1252Codec(allowInvalid: false);
       final decoded = codec.decode(response.bodyBytes);
       try {

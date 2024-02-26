@@ -41,7 +41,7 @@ class _StartupScreenState extends State<StartupScreen>
   }
 
   _openCoopUrl() async {
-    final Uri _url = Uri.parse("https://gpspay.io/llega/");
+    final Uri _url = Uri.parse("https://web.llega.com/llega/");
     if (await canLaunchUrl(_url)) {
       await launchUrl(_url);
     } else {
@@ -168,7 +168,7 @@ class _StartupScreenState extends State<StartupScreen>
 
     return WillPopScope(
         child: Scaffold(
-          backgroundColor: Color(0xff11273f),
+          backgroundColor: Color(0xFF42A5F5),
           body: SizedBox(
             child: SafeArea(
               child: Stack(

@@ -32,7 +32,7 @@ class _SelectCountryScreenState extends State<SelectCountryScreen> {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: const Color(0xFF0E2238),
+      backgroundColor: const Color(0xFF42A5F5),
       body: Stack(
         children: [
           Positioned(

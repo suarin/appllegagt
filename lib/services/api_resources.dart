@@ -36,6 +36,9 @@ class ApiResources {
   //Virtual Cards
   static const String virtualCardsUri = 'virtual_card/cards';
 
+  //Virtual Card Load
+  static const String virtualCardLoadUri = 'virtual_card/load';
+
   //Bills
   static const String billsUri = 'customer/billpay_request';
 
@@ -101,4 +104,7 @@ class ApiResources {
 
   //Visa Card Transactions
   static const String visaCardTransactionsUri = 'plastic_card/trans';
+
+  //Virtual Card Issue
+  static const String virtualCardIssueUri = 'Virtual_Card/Issue';
 }

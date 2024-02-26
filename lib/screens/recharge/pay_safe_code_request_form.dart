@@ -1,29 +1,57 @@
-import 'package:appllegagt/models/recharge/load_pay_safe_response.dart';
+import 'package:appllegagt/models/general/authorization_response.dart';
 import 'package:appllegagt/services/recharge_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CardLoadPaySafeForm extends StatefulWidget {
-  const CardLoadPaySafeForm({Key? key}) : super(key: key);
+class PaySafeCodeRequestForm extends StatefulWidget {
+  const PaySafeCodeRequestForm({Key? key}) : super(key: key);
 
   @override
-  _CardLoadPaySafeFormState createState() => _CardLoadPaySafeFormState();
+  _PaySafeCodeRequestFormState createState() => _PaySafeCodeRequestFormState();
 }
 
-class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm>
-    with WidgetsBindingObserver {
+class _PaySafeCodeRequestFormState extends State<PaySafeCodeRequestForm> {
+  //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
   final _amountController = TextEditingController();
-  LoadPaySafeResponse? loadPaySafeResponse;
+  final _depositTokenController = TextEditingController();
+  bool isProcessing = false;
+  bool bankLoaded = false;
+  bool _amountTextFieldEnabled = false;
+  bool _tokenFieldEnabled = false;
+  bool _sendButtonEnabled = false;
   bool _processingEnabled = false;
-  bool _depositRequestButtonEnabled = true;
-  String paySafeUrl = '';
+  AuthorizationResponse? authorizationResponse;
 
-//functions for dialogs
+  //Load token and amount values
+  _loadFormValues() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('paySafeAmount') != null) {
+      setState(() {
+        _amountController.text = prefs.getString('paySafeAmount').toString();
+        _amountTextFieldEnabled = true;
+      });
+    }
+
+    if (prefs.getString('paySafeToken') != null) {
+      setState(() {
+        _depositTokenController.text =
+            prefs.getString('paySafeToken').toString();
+        _tokenFieldEnabled = true;
+      });
+    }
+    if (_amountTextFieldEnabled && _tokenFieldEnabled) {
+      setState(() {
+        _sendButtonEnabled = true;
+      });
+    }
+  }
+
+  //functions for dialogs
   _showSuccessResponse(
-      BuildContext context, LoadPaySafeResponse loadPaySafeResponse) {
+      BuildContext context, AuthorizationResponse authorizationResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -43,13 +71,14 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm>
                           children: [
                             const SizedBox(
                               child: Text(
-                                'Token',
+                                'Autorizacion',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(loadPaySafeResponse.Token.toString()),
+                              child:
+                                  Text(authorizationResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -111,30 +140,36 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm>
 
   //Check response
   _checkResponse(BuildContext context, dynamic json) async {
-    final prefs = await SharedPreferences.getInstance();
     if (json['ErrorCode'] == 0) {
-      loadPaySafeResponse = LoadPaySafeResponse.fromJson(json);
-      prefs.setString('paySafeAmount', _amountController.text);
-      prefs.setString('paySafeToken', loadPaySafeResponse!.Token.toString());
-      setState(() {
-        _processingEnabled = false;
-        _depositRequestButtonEnabled = true;
-      });
-
-      _showSuccessResponse(context, loadPaySafeResponse!);
+      AuthorizationResponse authorizationResponse =
+          AuthorizationResponse.fromJson(json);
+      _showSuccessResponse(context, authorizationResponse);
     } else {
-      String errorMessage = await SystemErrors.getSystemError(0);
+      String errorMessage =
+          await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
-      _resetForm();
     }
   }
 
   //Reset form
-  _resetForm() {
+  _resetForm() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('paySafeAmount') != null) {
+      prefs.remove('paySafeAmount');
+      _amountTextFieldEnabled = false;
+    }
+    if (prefs.getString('paySafeToken') != null) {
+      prefs.remove('paySafeToken');
+      _tokenFieldEnabled = false;
+    }
     setState(() {
-      _processingEnabled = false;
+      isProcessing = false;
+      _depositTokenController.text = '';
       _amountController.text = '';
-      _depositRequestButtonEnabled = true;
+      _amountTextFieldEnabled = false;
+      _tokenFieldEnabled = false;
+      _sendButtonEnabled = false;
+      _processingEnabled = false;
     });
   }
 
@@ -142,12 +177,15 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm>
   _executeTransaction(BuildContext context) async {
     setState(() {
       _processingEnabled = true;
-      _depositRequestButtonEnabled = false;
+      _sendButtonEnabled = false;
     });
-    await RechargeServices.getLoadPaySafe(_amountController.text)
+    await RechargeServices.getLoadPaySafeCode(
+            _amountController.text, _depositTokenController.text)
         .then((response) => {
               if (response['ErrorCode'] != null)
-                {_checkResponse(context, response)}
+                {
+                  _checkResponse(context, response),
+                }
             })
         .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -172,16 +210,18 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm>
 
   @override
   void initState() {
+    _loadFormValues();
     _setLastPage();
     super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     var screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Solicitar codigo PaySafe'),
+        title: const Text('Solicitar \nCódigo PaySafe'),
         backgroundColor: const Color(0XFF0E325F),
       ),
       backgroundColor: const Color(0XFFAFBECC),
@@ -196,36 +236,84 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm>
                   children: [
                     ListView(
                       children: [
-                        Container(
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Monto * (NO MAYOR de 500.00)',
-                                errorStyle: TextStyle(
-                                  fontSize: 8,
-                                )),
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obligatorio';
-                              }
-                            },
-                            controller: _amountController,
+                        Visibility(
+                          child: Container(
+                            child: const Text('Solicitar código PaySafe'),
+                            decoration: const BoxDecoration(
+                              color: Color(0XFFEFEFEF),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            height: 50.0,
+                            margin: const EdgeInsets.only(bottom: 5.0),
+                            padding: const EdgeInsets.only(left: 10.0),
                           ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
+                          visible:
+                              !_tokenFieldEnabled && !_amountTextFieldEnabled,
+                        ),
+                        Visibility(
+                          child: Container(
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Monto *',
+                                  errorStyle: TextStyle(
+                                    fontSize: 8,
+                                  )),
+                              keyboardType: TextInputType.phone,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Campo obligatorio';
+                                }
+                              },
+                              controller: _amountController,
+                            ),
+                            decoration: const BoxDecoration(
+                              color: Color(0XFFEFEFEF),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            height: 50.0,
+                            margin:
+                                const EdgeInsets.only(bottom: 5.0, top: 10.0),
+                            padding: const EdgeInsets.only(left: 10.0),
                           ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0, top: 10.0),
-                          padding: const EdgeInsets.only(left: 10.0),
+                          visible: _amountTextFieldEnabled,
+                        ),
+                        Visibility(
+                          child: Container(
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Token *',
+                                  errorStyle: TextStyle(
+                                    fontSize: 8,
+                                  )),
+                              keyboardType: TextInputType.phone,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Campo obligatorio';
+                                }
+                              },
+                              controller: _depositTokenController,
+                            ),
+                            decoration: const BoxDecoration(
+                              color: Color(0XFFEFEFEF),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            height: 50.0,
+                            margin:
+                                const EdgeInsets.only(bottom: 5.0, top: 10.0),
+                            padding: const EdgeInsets.only(left: 10.0),
+                          ),
+                          visible: _tokenFieldEnabled,
                         ),
                         Visibility(
                           child: Container(
                             child: TextButton(
                               child: const Text(
-                                'Solicitar',
+                                'Recargar',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
@@ -243,7 +331,7 @@ class _CardLoadPaySafeFormState extends State<CardLoadPaySafeForm>
                             width: screenWidth,
                             margin: const EdgeInsets.only(bottom: 5.0),
                           ),
-                          visible: _depositRequestButtonEnabled,
+                          visible: _sendButtonEnabled,
                         ),
                       ],
                     ),

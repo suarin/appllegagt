@@ -1,97 +1,47 @@
-import 'package:appllegagt/models/general/login_success_response.dart';
-import 'package:appllegagt/models/general/visa_card.dart';
-import 'package:appllegagt/models/general/visa_cards_response.dart';
-import 'package:appllegagt/models/recharge/card_load_cash_response.dart';
+import 'package:appllegagt/models/general/authorization_response.dart';
+import 'package:appllegagt/models/general/virtual_card.dart';
+import 'package:appllegagt/models/general/virtual_cards_response.dart';
 import 'package:appllegagt/services/general_services.dart';
-import 'package:appllegagt/services/qr_scanner.dart';
-import 'package:appllegagt/services/recharge_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
+import 'package:appllegagt/services/transfer_services.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CardLoadCashForm extends StatefulWidget {
-  const CardLoadCashForm({Key? key}) : super(key: key);
+class VirtualTransferForm extends StatefulWidget {
+  const VirtualTransferForm({Key? key}) : super(key: key);
 
   @override
-  _CardLoadCashFormState createState() => _CardLoadCashFormState();
+  _VirtualTransferFormState createState() => _VirtualTransferFormState();
 }
 
-class _CardLoadCashFormState extends State<CardLoadCashForm>
+class _VirtualTransferFormState extends State<VirtualTransferForm>
     with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
-  final _merchantController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _mobileController = TextEditingController();
   final _amountController = TextEditingController();
   final _virtualCardController = TextEditingController();
-  VisaCard? selectedVisaCard;
-  VisaCardsResponse? visaCardsResponse;
-  bool isProcessing = false;
-  bool visaCardsLoaded = false;
-  CardLoadCashResponse cardLoadCashResponse = CardLoadCashResponse();
-  bool isGT = false;
-  bool isUS = false;
   var screenWidth, screenHeight;
-
-  //Load Country Scope
-  _getCountryScope() async {
-    final prefs = await SharedPreferences.getInstance();
-    String countryScope = prefs.getString('countryScope')!;
-    if (countryScope == 'GT') {
-      setState(() {
-        isGT = true;
-      });
-    }
-
-    if (countryScope == 'US') {
-      setState(() {
-        isUS = true;
-      });
-    }
-  }
-
-  //function to Scan QR
-  _scanQR(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isScanning', true);
-    await prefs.setString('lastPage', 'qr');
-    await QRScanner.scanQR().then((result) => {
-          setState(() {
-            _merchantController.text = result.toString();
-          }),
-        });
-  }
-
-  //Get user data
-  _getUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    LoginSuccessResponse loginSuccessResponse = LoginSuccessResponse(
-        errorCode: 0,
-        cHolderID: prefs.getInt('cHolderID'),
-        userName: prefs.getString('userName'),
-        cardNo: prefs.getString('cardNo'),
-        currency: prefs.getString('currency'),
-        balance: prefs.getString('balance'));
-    setState(() {
-      _virtualCardController.text = loginSuccessResponse.cardNo.toString();
-    });
-  }
+  bool isProcessing = false;
+  AuthorizationResponse authorizationResponse = AuthorizationResponse();
+  VirtualCardsResponse? cards;
+  VirtualCard? selectedVirtualCard;
+  bool virtualCardsLoaded = false;
 
   //function to obtain Visa Cards for picker
   _getVirtualCards() async {
     await GeneralServices.getVirtualCards().then((list) => {
           setState(() {
-            visaCardsResponse = VisaCardsResponse.fromJson(list);
-            visaCardsLoaded = true;
+            cards = VirtualCardsResponse.fromJson(list);
+            virtualCardsLoaded = true;
           })
         });
   }
 
   //functions for dialogs
   _showSuccessResponse(
-      BuildContext context, CardLoadCashResponse cardLoadCashResponse) {
+      BuildContext context, AuthorizationResponse authorizationResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -111,30 +61,14 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>
                           children: [
                             const SizedBox(
                               child: Text(
-                                'Balance',
+                                'No Autorizacion',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
-                              child: Text(
-                                  '${isUS ? "USD " : "Q "} ${cardLoadCashResponse.balance.toString()}'),
-                              width: 150,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const SizedBox(
-                              child: Text(
-                                'Autorizacion',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              width: 150,
-                            ),
-                            SizedBox(
-                              child: Text(
-                                  '${isUS ? "USD " : "Q "} ${cardLoadCashResponse.authno.toString()}'),
+                              child:
+                                  Text(authorizationResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -195,23 +129,25 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>
 
   //Check response
   _checkResponse(BuildContext context, dynamic json) async {
-    if (json['ErrorCode'] == 0) {
-      CardLoadCashResponse cardLoadCashResponse =
-          CardLoadCashResponse.fromJson(json);
-      _showSuccessResponse(context, cardLoadCashResponse);
-    } else {
-      String errorMessage =
-          await SystemErrors.getSystemError(json['ErrorCode']);
-      _showErrorResponse(context, errorMessage);
+    try {
+      if (json['ErrorCode'] == 0) {
+        AuthorizationResponse authorizationResponse =
+            AuthorizationResponse.fromJson(json);
+        _showSuccessResponse(context, authorizationResponse);
+      } else {
+        String errorMessage =
+            await SystemErrors.getSystemError(json['ErrorCode']);
+        _showErrorResponse(context, errorMessage);
+      }
+    } catch (e) {
+      _showErrorResponse(context, e.toString());
     }
   }
 
-  //Reset form
+  //Reset From
   _resetForm() {
     setState(() {
       isProcessing = false;
-      _mobileController.text = '';
-      _merchantController.text = '';
       _passwordController.text = '';
       _amountController.text = '';
       _virtualCardController.text = '';
@@ -223,12 +159,8 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>
     setState(() {
       isProcessing = true;
     });
-    await RechargeServices.getCardLoadCash(
-            _merchantController.text,
-            _passwordController.text,
-            _virtualCardController.text,
-            _mobileController.text,
-            _amountController.text)
+    await TransferServices.getVirtualLoad(_passwordController.text,
+            _amountController.text, selectedVirtualCard!.cardNo.toString())
         .then((response) => {
               if (response['ErrorCode'] != null)
                 {
@@ -247,29 +179,38 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>
           backgroundColor: Colors.red,
         ),
       );
+
       _resetForm();
     });
+
     _resetForm();
+  }
+
+  _setLastPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastPage', 'principalScreen');
   }
 
   @override
   void initState() {
     _getVirtualCards();
-    _getUserData();
-    _getCountryScope();
+    _setLastPage();
     super.initState();
   }
 
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recarga con QR'),
+        title: const Text(
+          'Transferencia a \n Tarjeta Virtual',
+          style: TextStyle(fontSize: 16),
+        ),
         backgroundColor: const Color(0XFF0E325F),
       ),
       backgroundColor: const Color(0XFFAFBECC),
-      key: scaffoldStateKey,
       body: Builder(
         builder: (context) => Form(
           key: _formKey,
@@ -280,136 +221,75 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>
                   children: [
                     ListView(
                       children: [
-                        Container(
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                child: TextFormField(
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: 'Comercio *',
-                                    errorStyle: TextStyle(
-                                      fontSize: 8,
+                        virtualCardsLoaded
+                            ? Container(
+                                child: DropdownButton<VirtualCard>(
+                                  hint: const Text(
+                                    'Seleccionar Tarjeta',
+                                    style: TextStyle(
+                                      color: Colors.black26,
+                                      fontFamily: 'VarelaRoundRegular',
                                     ),
                                   ),
-                                  keyboardType: TextInputType.phone,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Campo obligatorio';
-                                    }
+                                  value: selectedVirtualCard,
+                                  onChanged: (VirtualCard? value) {
+                                    setState(() {
+                                      selectedVirtualCard = value;
+                                    });
                                   },
-                                  controller: _merchantController,
+                                  items: cards!.virtualCards!
+                                      .map((VirtualCard virtualCard) {
+                                    return DropdownMenuItem<VirtualCard>(
+                                      value: virtualCard,
+                                      child: Container(
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        width: 250,
+                                        child: Text(
+                                          '${virtualCard.cardNo}',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'VarelaRoundRegular',
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
-                                width: 250,
-                              ),
-                              SizedBox(
-                                child: IconButton(
-                                  icon: Image.asset(
-                                      'images/icons/qr_scan_icon.png'),
-                                  onPressed: () {
-                                    _scanQR(context);
-                                  },
-                                ),
-                                width: 50,
-                                height: 50,
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                margin: const EdgeInsets.only(bottom: 15.0),
+                                padding: const EdgeInsets.only(left: 10.0),
+                                width: 300,
                               )
-                            ],
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                        ),
-                        Container(
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Cuenta LLEGA *',
-                              errorStyle: TextStyle(
-                                fontSize: 8,
+                            : Container(
+                                child: const TextField(
+                                  decoration: InputDecoration(
+                                      label: Text(
+                                        'Sin Tarjetas',
+                                        style: TextStyle(
+                                          color: Colors.black26,
+                                          fontFamily: 'VarelaRoundRegular',
+                                        ),
+                                      ),
+                                      border: InputBorder.none),
+                                  keyboardType: TextInputType.phone,
+                                ),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                margin: const EdgeInsets.only(bottom: 15.0),
+                                padding: const EdgeInsets.only(left: 10.0),
+                                width: 300,
                               ),
-                            ),
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obligatorio';
-                              }
-                            },
-                            controller: _virtualCardController,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                        ),
-                        Container(
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Solicitar contraseña a comercio *',
-                              errorStyle: TextStyle(
-                                fontSize: 8,
-                              ),
-                            ),
-                            obscureText: true,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obligatorio';
-                              }
-                            },
-                            controller: _passwordController,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                        ),
-                        Container(
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Telefono *',
-                              errorStyle: TextStyle(
-                                fontSize: 8,
-                              ),
-                            ),
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obligatorio';
-                              }
-                            },
-                            controller: _mobileController,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                        ),
                         Container(
                           child: TextFormField(
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Monto *',
-                              errorStyle: TextStyle(
-                                fontSize: 8,
-                              ),
                             ),
                             keyboardType: TextInputType.phone,
                             validator: (value) {
@@ -428,11 +308,34 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>
                           margin: const EdgeInsets.only(bottom: 5.0),
                           padding: const EdgeInsets.only(left: 10.0),
                         ),
+                        Container(
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'PIN WEB *',
+                            ),
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Campo obligatorio';
+                              }
+                            },
+                            controller: _passwordController,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Color(0XFFEFEFEF),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          height: 50.0,
+                          margin: const EdgeInsets.only(bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 10.0),
+                        ),
                         Visibility(
                           child: Container(
                             child: TextButton(
                               child: const Text(
-                                'Solicitar',
+                                'Transferir',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
@@ -487,3 +390,4 @@ class _CardLoadCashFormState extends State<CardLoadCashForm>
     );
   }
 }
+

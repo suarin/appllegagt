@@ -1,6 +1,6 @@
 import 'package:appllegagt/models/general/transaction.dart';
-import 'package:appllegagt/models/general/visa_card.dart';
-import 'package:appllegagt/models/general/visa_cards_response.dart';
+import 'package:appllegagt/models/general/virtual_card.dart';
+import 'package:appllegagt/models/general/virtual_cards_response.dart';
 import 'package:appllegagt/models/shop/virtual_transaction.dart';
 import 'package:appllegagt/models/shop/virtual_transactions_response.dart';
 import 'package:appllegagt/services/general_services.dart';
@@ -24,11 +24,11 @@ class _VirtualTransactionsScreenState extends State<VirtualTransactionsScreen>
   bool transactionsLoaded = false;
   bool isProcessing = false;
   bool showButton = true;
-  bool visaCardsLoaded = false;
+  bool virtualCardsLoaded = false;
   Transaction? transaction;
   VirtualTransactionsResponse? virtualTransactionsResponse;
-  VisaCard? selectedVisaCard;
-  VisaCardsResponse? cards;
+  VirtualCard? selectedVirtualCard;
+  VirtualCardsResponse? cards;
   bool isGT = false;
   bool isUS = false;
   var screenWidth, screenHeight;
@@ -51,11 +51,11 @@ class _VirtualTransactionsScreenState extends State<VirtualTransactionsScreen>
   }
 
   //function to obtain Visa Cards for picker
-  _getVisaCards() async {
+  _getVirtualCards() async {
     await GeneralServices.getVirtualCards().then((list) => {
           setState(() {
-            cards = VisaCardsResponse.fromJson(list);
-            visaCardsLoaded = true;
+            cards = VirtualCardsResponse.fromJson(list);
+            virtualCardsLoaded = true;
           })
         });
   }
@@ -84,7 +84,7 @@ class _VirtualTransactionsScreenState extends State<VirtualTransactionsScreen>
                   child: const Text('Cerrar'),
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    primary: const Color(0XFF0E325F),
+                    backgroundColor: const Color(0XFF0E325F),
                   ),
                 )
               ],
@@ -114,7 +114,7 @@ class _VirtualTransactionsScreenState extends State<VirtualTransactionsScreen>
       showButton = false;
     });
     await PurchaseService.getVirtualTransactions(
-            selectedVisaCard.toString(), _endDateController.text)
+            selectedVirtualCard!.cardNo.toString(), _endDateController.text)
         .then((list) => {
               virtualTransactionsResponse =
                   VirtualTransactionsResponse.fromJson(list),
@@ -136,7 +136,7 @@ class _VirtualTransactionsScreenState extends State<VirtualTransactionsScreen>
 
   @override
   void initState() {
-    _getVisaCards();
+    _getVirtualCards();
     _getCountryScope();
     _setLastPage();
     super.initState();
@@ -157,12 +157,12 @@ class _VirtualTransactionsScreenState extends State<VirtualTransactionsScreen>
       key: scaffoldStateKey,
       body: Builder(
         builder: (context) => SizedBox(
-          child: Column(
-            children: [
-              Visibility(
-                  child: visaCardsLoaded
+              child: Column(
+              children: [
+                Visibility(
+                  child: virtualCardsLoaded
                       ? Container(
-                          child: DropdownButton<VisaCard>(
+                          child: DropdownButton<VirtualCard>(
                             hint: const Text(
                               'Seleccionar Tarjeta',
                               style: TextStyle(
@@ -170,20 +170,20 @@ class _VirtualTransactionsScreenState extends State<VirtualTransactionsScreen>
                                 fontFamily: 'VarelaRoundRegular',
                               ),
                             ),
-                            value: selectedVisaCard,
-                            onChanged: (VisaCard? value) {
+                            value: selectedVirtualCard,
+                            onChanged: (VirtualCard? value) {
                               setState(() {
-                                selectedVisaCard = value;
+                                selectedVirtualCard = value;
                               });
                             },
-                            items: cards!.visaCards!.map((VisaCard visaCard) {
-                              return DropdownMenuItem<VisaCard>(
-                                value: visaCard,
+                            items: cards!.virtualCards!.map((VirtualCard virtualCard) {
+                              return DropdownMenuItem<VirtualCard>(
+                                value: virtualCard,
                                 child: Container(
                                   padding: const EdgeInsets.only(left: 5.0),
                                   width: 250,
                                   child: Text(
-                                    '${visaCard.cardNo}',
+                                    '${virtualCard.cardNo}',
                                     style: const TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'VarelaRoundRegular',
@@ -281,7 +281,7 @@ class _VirtualTransactionsScreenState extends State<VirtualTransactionsScreen>
                   ),
                   width: 325,
                 ),
-                visible: showButton,
+                visible: !isProcessing,
               ),
               transactionsLoaded
                   ? SizedBox(
@@ -458,8 +458,8 @@ class _VirtualTransactionsScreenState extends State<VirtualTransactionsScreen>
                   : const Text('')
             ],
           ),
-          width: screenWidth,
-          height: screenHeight,
+            width: screenWidth,
+            height: screenHeight,
         ),
       ),
     );

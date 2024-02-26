@@ -52,12 +52,13 @@ class _VisaCardTransactionsScreenState extends State<VisaCardTransactionsScreen>
 
   //function to obtain Visa Cards for picker
   _getVisaCards() async {
-    await GeneralServices.getVisaCards().then((list) => {
-          setState(() {
-            cards = VisaCardsResponse.fromJson(list);
-            visaCardsLoaded = true;
-          })
-        });
+    await GeneralServices.getVisaCards().then((list) =>
+    {
+      setState(() {
+        cards = VisaCardsResponse.fromJson(list);
+        visaCardsLoaded = true;
+      })
+    });
   }
 
   //Functions for dialogs
@@ -84,7 +85,7 @@ class _VisaCardTransactionsScreenState extends State<VisaCardTransactionsScreen>
                   child: const Text('Cerrar'),
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    primary: const Color(0XFF0E325F),
+                    backgroundColor: const Color(0XFF0E325F),
                   ),
                 )
               ],
@@ -114,14 +115,15 @@ class _VisaCardTransactionsScreenState extends State<VisaCardTransactionsScreen>
       showButton = false;
     });
     await PurchaseService.getVisaTransactions(
-            selectedVisaCard!.cardNo.toString(), _endDateController.text)
-        .then((list) => {
-              visaTransactionsResponse =
-                  VisaTransactionsResponse.fromJson(list),
-              setState(() {
-                transactionsLoaded = true;
-              })
-            })
+        selectedVisaCard!.cardNo.toString(), _endDateController.text)
+        .then((list) =>
+    {
+      visaTransactionsResponse =
+          VisaTransactionsResponse.fromJson(list),
+      setState(() {
+        transactionsLoaded = true;
+      })
+    })
         .catchError((Object error) {
       _showErrorResponse(context, error.toString());
       _resetForm();
@@ -165,66 +167,66 @@ class _VisaCardTransactionsScreenState extends State<VisaCardTransactionsScreen>
               Visibility(
                 child: visaCardsLoaded
                     ? Container(
-                        child: DropdownButton<VisaCard>(
-                          hint: const Text(
-                            'Seleccionar Tarjeta',
-                            style: TextStyle(
-                              color: Colors.black26,
+                  child: DropdownButton<VisaCard>(
+                    hint: const Text(
+                      'Seleccionar Tarjeta',
+                      style: TextStyle(
+                        color: Colors.black26,
+                        fontFamily: 'VarelaRoundRegular',
+                      ),
+                    ),
+                    value: selectedVisaCard,
+                    onChanged: (VisaCard? value) {
+                      setState(() {
+                        selectedVisaCard = value;
+                      });
+                    },
+                    items: cards!.visaCards!.map((VisaCard visaCard) {
+                      return DropdownMenuItem<VisaCard>(
+                        value: visaCard,
+                        child: Container(
+                          padding: const EdgeInsets.only(left: 5.0),
+                          width: 250,
+                          child: Text(
+                            '${visaCard.cardNo}',
+                            style: const TextStyle(
+                              color: Colors.black,
                               fontFamily: 'VarelaRoundRegular',
                             ),
                           ),
-                          value: selectedVisaCard,
-                          onChanged: (VisaCard? value) {
-                            setState(() {
-                              selectedVisaCard = value;
-                            });
-                          },
-                          items: cards!.visaCards!.map((VisaCard visaCard) {
-                            return DropdownMenuItem<VisaCard>(
-                              value: visaCard,
-                              child: Container(
-                                padding: const EdgeInsets.only(left: 5.0),
-                                width: 250,
-                                child: Text(
-                                  '${visaCard.cardNo}',
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'VarelaRoundRegular',
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
                         ),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(30.0))),
-                        margin: const EdgeInsets.only(bottom: 15.0),
-                        padding: const EdgeInsets.only(left: 10.0),
-                        width: 300,
-                      )
+                      );
+                    }).toList(),
+                  ),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black),
+                      borderRadius:
+                      const BorderRadius.all(Radius.circular(30.0))),
+                  margin: const EdgeInsets.only(bottom: 15.0),
+                  padding: const EdgeInsets.only(left: 10.0),
+                  width: 300,
+                )
                     : Container(
-                        child: const TextField(
-                          decoration: InputDecoration(
-                              label: Text(
-                                'Sin Tarjetas',
-                                style: TextStyle(
-                                  color: Colors.black26,
-                                  fontFamily: 'VarelaRoundRegular',
-                                ),
-                              ),
-                              border: InputBorder.none),
-                          keyboardType: TextInputType.phone,
+                  child: const TextField(
+                    decoration: InputDecoration(
+                        label: Text(
+                          'Sin Tarjetas',
+                          style: TextStyle(
+                            color: Colors.black26,
+                            fontFamily: 'VarelaRoundRegular',
+                          ),
                         ),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(30.0))),
-                        margin: const EdgeInsets.only(bottom: 15.0),
-                        padding: const EdgeInsets.only(left: 10.0),
-                        width: 300,
-                      ),
+                        border: InputBorder.none),
+                    keyboardType: TextInputType.phone,
+                  ),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black),
+                      borderRadius:
+                      const BorderRadius.all(Radius.circular(30.0))),
+                  margin: const EdgeInsets.only(bottom: 15.0),
+                  padding: const EdgeInsets.only(left: 10.0),
+                  width: 300,
+                ),
                 visible: !transactionsLoaded,
               ),
               Visibility(
@@ -233,7 +235,7 @@ class _VisaCardTransactionsScreenState extends State<VisaCardTransactionsScreen>
                     child: TextFormField(
                       controller: _endDateController,
                       decoration:
-                          InputDecoration(hintText: 'Fecha Final de Reporte'),
+                      InputDecoration(hintText: 'Fecha Final de Reporte'),
                       enabled: false,
                       style: const TextStyle(
                         fontSize: 20,
@@ -285,176 +287,176 @@ class _VisaCardTransactionsScreenState extends State<VisaCardTransactionsScreen>
                   ),
                   width: 325,
                 ),
-                visible: showButton,
+                visible: !isProcessing,
               ),
               transactionsLoaded
                   ? SizedBox(
-                      child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount:
-                              visaTransactionsResponse!.transacciones!.length,
-                          itemBuilder: (context, index) {
-                            VisaTransaction visaTransaction =
-                                visaTransactionsResponse!.transacciones![index];
-                            return Container(
-                              child: Center(
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          child: Text(
-                                            'ID: ',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          width: 100,
-                                        ),
-                                        SizedBox(
-                                          child: Text(
-                                            visaTransaction.id.toString(),
-                                          ),
-                                        ),
-                                      ],
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount:
+                      visaTransactionsResponse!.transacciones!.length,
+                      itemBuilder: (context, index) {
+                        VisaTransaction visaTransaction =
+                        visaTransactionsResponse!.transacciones![index];
+                      return Container(
+                        child: Center(
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  const SizedBox(
+                                    child: Text(
+                                      'ID: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          child: Text(
-                                            'Descripcion: ',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          width: 100,
-                                        ),
-                                        SizedBox(
-                                          child: Text(
-                                            visaTransaction.description
-                                                .toString(),
-                                          ),
-                                          width: 200,
-                                        ),
-                                      ],
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                    width: 100,
+                                  ),
+                                  SizedBox(
+                                    child: Text(
+                                      visaTransaction.id.toString(),
                                     ),
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          child: Text(
-                                            'Referencia: ',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          width: 100,
-                                        ),
-                                        SizedBox(
-                                          child: Text(
-                                            visaTransaction.reference
-                                                .toString(),
-                                          ),
-                                        ),
-                                      ],
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                    ),
-                                    Row(
-                                      children: [
-                                        SizedBox(
-                                          child: Text(
-                                            'Monto: ',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: double.parse(
-                                                          visaTransaction!
-                                                              .amount!) <
-                                                      0
-                                                  ? Colors.redAccent
-                                                  : Colors.black54,
-                                            ),
-                                          ),
-                                          width: 100,
-                                        ),
-                                        SizedBox(
-                                          child: Text(
-                                            visaTransaction.amount.toString(),
-                                            style: TextStyle(
-                                              color: double.parse(
-                                                          visaTransaction!
-                                                              .amount!) <
-                                                      0
-                                                  ? Colors.redAccent
-                                                  : Colors.black54,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                    ),
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          child: Text(
-                                            'Balance: ',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.green),
-                                          ),
-                                          width: 100,
-                                        ),
-                                        SizedBox(
-                                          child: Text(
-                                            visaTransaction.balance.toString(),
-                                            style: const TextStyle(
-                                                color: Colors.green),
-                                          ),
-                                        ),
-                                      ],
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                    ),
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          child: Text(
-                                            'Insertado: ',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          width: 100,
-                                        ),
-                                        SizedBox(
-                                          child: Text(
-                                            visaTransaction.inserted.toString(),
-                                          ),
-                                        ),
-                                      ],
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                    ),
-                                  ],
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                ),
+                                  ),
+                                ],
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
                               ),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
+                              Row(
+                                children: [
+                                  const SizedBox(
+                                    child: Text(
+                                      'Descripcion: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    width: 100,
+                                  ),
+                                  SizedBox(
+                                    child: Text(
+                                      visaTransaction.description
+                                          .toString(),
+                                    ),
+                                    width: 200,
+                                  ),
+                                ],
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
                               ),
-                              margin: const EdgeInsets.all(5),
-                              padding: const EdgeInsets.only(left: 10),
-                              width: 300,
-                              height: 200,
-                            );
-                          }),
-                      height: screenHeight - 100,
-                      width: screenWidth,
-                    )
+                              Row(
+                                children: [
+                                  const SizedBox(
+                                    child: Text(
+                                      'Referencia: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    width: 100,
+                                  ),
+                                  SizedBox(
+                                    child: Text(
+                                      visaTransaction.reference
+                                          .toString(),
+                                    ),
+                                  ),
+                                ],
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    child: Text(
+                                      'Monto: ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: double.parse(
+                                            visaTransaction!
+                                                .amount!) <
+                                            0
+                                            ? Colors.redAccent
+                                            : Colors.black54,
+                                      ),
+                                    ),
+                                    width: 100,
+                                  ),
+                                  SizedBox(
+                                    child: Text(
+                                      visaTransaction.amount.toString(),
+                                      style: TextStyle(
+                                        color: double.parse(
+                                            visaTransaction!
+                                                .amount!) <
+                                            0
+                                            ? Colors.redAccent
+                                            : Colors.black54,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                              ),
+                              Row(
+                                children: [
+                                  const SizedBox(
+                                    child: Text(
+                                      'Balance: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green),
+                                    ),
+                                    width: 100,
+                                  ),
+                                  SizedBox(
+                                    child: Text(
+                                      visaTransaction.balance.toString(),
+                                      style: const TextStyle(
+                                          color: Colors.green),
+                                    ),
+                                  ),
+                                ],
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                              ),
+                              Row(
+                                children: [
+                                  const SizedBox(
+                                    child: Text(
+                                      'Insertado: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    width: 100,
+                                  ),
+                                  SizedBox(
+                                    child: Text(
+                                      visaTransaction.inserted.toString(),
+                                    ),
+                                  ),
+                                ],
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                              ),
+                            ],
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceEvenly,
+                          ),
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(15)),
+                        ),
+                        margin: const EdgeInsets.all(5),
+                        padding: const EdgeInsets.only(left: 10),
+                        width: 300,
+                        height: 200,
+                      );
+                    }),
+                height: screenHeight - 100,
+                width: screenWidth,
+              )
                   : const Text('')
             ],
           ),
@@ -465,3 +467,4 @@ class _VisaCardTransactionsScreenState extends State<VisaCardTransactionsScreen>
     );
   }
 }
+

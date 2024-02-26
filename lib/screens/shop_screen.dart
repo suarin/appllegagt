@@ -9,6 +9,8 @@ import 'package:appllegagt/screens/transfer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:appllegagt/widgets/option_button.dart';
+import 'issue/visa_request_form.dart';
+import 'issue/virtual_card_issue_form.dart';
 
 class ShopScreen extends StatefulWidget {
   const ShopScreen({Key? key}) : super(key: key);
@@ -96,7 +98,7 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
     var cardLeftDistance = (screenWidth - 325.0) / 2;
     return WillPopScope(
       child: Scaffold(
-        backgroundColor: const Color(0xFF0E2238),
+        backgroundColor: const Color(0xFF42A5F5),
         body: SizedBox(
           child: SafeArea(
             child: Stack(
@@ -116,26 +118,31 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
                           top: 25.0,
                         ),
                         Positioned(
-                            child: Text(
-                              cardNo,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                letterSpacing: 5,
-                              ),
+                          child: Text(
+                            // Format cardNo to "XXXX XXXX XXXX XXXX"
+                            '${cardNo.substring(0, 4)} ${cardNo.substring(4, 8)} ${cardNo.substring(8, 12)} ${cardNo.substring(12)}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              letterSpacing: 5,
                             ),
-                            left: 25.0,
-                            top: 75.0),
+                          ),
+                          left: 25.0,
+                          top: 75.0,
+                        ),
                         Positioned(
-                            child: Text(
-                              '$currency $balance',
-                              style: const TextStyle(color: Colors.white),
+                          child: Text(
+                            '$currency $balance',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22.0,
                             ),
-                            left: 15.0,
-                            top: 140.0),
+                          ),
+                          left: 15.0,
+                          top: 140.0,
+                        ),
                         Positioned(
                           child: SizedBox(
-                            child: Image.asset(
-                                'images/llegelogoblanco154x154.png'),
+                            child: Image.asset('images/llegelogoblanco154x154.png'),
                             height: 100.0,
                             width: 100.0,
                           ),
@@ -359,6 +366,32 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
                                 );
                               },
                             )
+                          : const Text(''),
+                      isUS
+                      ? OptionButton(
+                        label: 'Solicitar Tarjeta Visa',
+                        onPress: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const VisaRequestForm(),
+                            ),
+                          );
+                        },
+                      )
+                          : const Text(''),
+                      isUS
+                          ? OptionButton(
+                            label: 'Solicitar Tarjeta Virtual',
+                            onPress: () {
+                              Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const VirtualCardIssueForm(),
+                            ),
+                          );
+                        },
+                      )
                           : const Text(''),
                     ],
                   ),

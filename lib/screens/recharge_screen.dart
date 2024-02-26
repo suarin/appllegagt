@@ -2,11 +2,9 @@ import 'package:appllegagt/models/general/login_success_response.dart';
 import 'package:appllegagt/screens/procedure_screen.dart';
 import 'package:appllegagt/screens/recharge/ach_transfer_form.dart';
 import 'package:appllegagt/screens/recharge/akisi_cash_form.dart';
-import 'package:appllegagt/screens/recharge/card_load_cash_form.dart';
 import 'package:appllegagt/screens/recharge/card_load_voucher_form.dart';
 import 'package:appllegagt/screens/recharge/pay_safe_options_screen.dart';
 import 'package:appllegagt/screens/recharge/ypayme_bank_deposit_form.dart';
-import 'package:appllegagt/screens/recharge/zelle_alert.dart';
 import 'package:appllegagt/screens/select_country_screen.dart';
 import 'package:appllegagt/screens/shop_screen.dart';
 import 'package:appllegagt/screens/transfer_screen.dart';
@@ -102,7 +100,7 @@ class _RechargeScreenState extends State<RechargeScreen>
 
     return WillPopScope(
       child: Scaffold(
-        backgroundColor: const Color(0xFF0E2238),
+        backgroundColor: const Color(0xFF42A5F5),
         body: SizedBox(
           child: SafeArea(
             child: Stack(
@@ -122,26 +120,31 @@ class _RechargeScreenState extends State<RechargeScreen>
                           top: 25.0,
                         ),
                         Positioned(
-                            child: Text(
-                              cardNo,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                letterSpacing: 5,
-                              ),
+                          child: Text(
+                            // Format cardNo to "XXXX XXXX XXXX XXXX"
+                            '${cardNo.substring(0, 4)} ${cardNo.substring(4, 8)} ${cardNo.substring(8, 12)} ${cardNo.substring(12)}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              letterSpacing: 5,
                             ),
-                            left: 25.0,
-                            top: 75.0),
+                          ),
+                          left: 25.0,
+                          top: 75.0,
+                        ),
                         Positioned(
-                            child: Text(
-                              '$currency $balance',
-                              style: const TextStyle(color: Colors.white),
+                          child: Text(
+                            '$currency $balance',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22.0,
                             ),
-                            left: 15.0,
-                            top: 140.0),
+                          ),
+                          left: 15.0,
+                          top: 140.0,
+                        ),
                         Positioned(
                           child: SizedBox(
-                            child: Image.asset(
-                                'images/llegelogoblanco154x154.png'),
+                            child: Image.asset('images/llegelogoblanco154x154.png'),
                             height: 100.0,
                             width: 100.0,
                           ),
@@ -348,18 +351,9 @@ class _RechargeScreenState extends State<RechargeScreen>
                               },
                             )
                           : const Text(''),
-                      isUS
+                      isGT
                           ? OptionButton(
-                              label: 'Transferencia Bancaria (Zelle)',
-                              onPress: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ZelleAlert()));
-                              },
-                            )
-                          : OptionButton(
-                              label: 'INFORMACIÓN DE\nSU DEPÓSITO',
+                              label: 'INFORMACIÓN DE\nSU DEPÓSITO BANCO',
                               onPress: () {
                                 Navigator.push(
                                     context,
@@ -367,10 +361,11 @@ class _RechargeScreenState extends State<RechargeScreen>
                                         builder: (context) =>
                                             YPayMeBankDepositForm()));
                               },
-                            ),
+                            )
+                          : const Text(''),
                       isUS
                           ? OptionButton(
-                              label: 'En efectivo (PaySafeCash)',
+                              label: 'En efectivo (con Codigo de Barras)',
                               onPress: () {
                                 Navigator.push(
                                   context,
@@ -384,25 +379,13 @@ class _RechargeScreenState extends State<RechargeScreen>
                           : const Text(' '),
                       isUS
                           ? OptionButton(
-                              label: 'En efectivo (comercios afiliados)',
+                              label: 'En efectivo (comercios LLEGA afiliados)',
                               onPress: () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             const CardLoadVoucherForm()));
-                              },
-                            )
-                          : const Text(''),
-                      isUS
-                          ? OptionButton(
-                              label: 'Con QR (comercios afiliados)',
-                              onPress: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const CardLoadCashForm()));
                               },
                             )
                           : const Text(''),

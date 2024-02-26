@@ -163,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return WillPopScope(
         child: Scaffold(
-          backgroundColor: const Color(0XFF0E325F),
+          backgroundColor: const Color(0xFF42A5F5),
           key: scaffoldStateKey,
           body: Builder(
             builder: (context) => Form(
