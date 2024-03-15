@@ -203,9 +203,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   BorderRadius.all(Radius.circular(10))),
                           child: TextFormField(
                             decoration: const InputDecoration(
-                              hintText: 'Usuario',
+                              hintText: 'No. Celular *',
                               border: InputBorder.none,
                             ),
+                            keyboardType: TextInputType.phone,
                             textAlign: TextAlign.start,
                             style: const TextStyle(
                               fontSize: 24.0,
@@ -213,6 +214,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
+                              }
+                              if (value.length < 8) {
+                                return 'Mínimo 8 caracteres';
+                              }
+                              if (value.length > 10) {
+                                return 'Máximo 10 caracteres';
                               }
                             },
                             controller: _userController,
@@ -232,15 +239,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                   BorderRadius.all(Radius.circular(10))),
                           child: TextFormField(
                             decoration: const InputDecoration(
-                              hintText: 'Contraseña',
+                              hintText: 'PIN de Acceso *',
                               border: InputBorder.none,
                             ),
+                            keyboardType: TextInputType.phone,
                             obscureText: true,
                             textAlign: TextAlign.start,
                             style: const TextStyle(fontSize: 24.0),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
+                              }
+                              if (value.length < 4) {
+                                return 'Mínimo 4 caracteres';
+                              }
+                              if (value.length > 4) {
+                                return 'Máximo 4 caracteres';
                               }
                             },
                             controller: _passwordController,

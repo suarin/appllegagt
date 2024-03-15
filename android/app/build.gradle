@@ -52,7 +52,7 @@ android {
         applicationId "com.ypayme.appllegagt"
         minSdkVersion 20
         targetSdkVersion 33
-        versionCode flutterVersionCode.toInteger() + 3
+        versionCode flutterVersionCode.toInteger() + 4
         versionName flutterVersionName
     }
 

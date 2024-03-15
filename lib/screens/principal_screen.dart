@@ -1,11 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:appllegagt/models/general/login_success_response.dart';
 import 'package:appllegagt/screens/procedure_screen.dart';
 import 'package:appllegagt/screens/recharge_screen.dart';
 import 'package:appllegagt/screens/select_country_screen.dart';
 import 'package:appllegagt/screens/shop_screen.dart';
 import 'package:appllegagt/screens/transfer_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PrincipalScreen extends StatefulWidget {
   const PrincipalScreen({Key? key}) : super(key: key);
@@ -57,8 +57,10 @@ class _PrincipalScreenState extends State<PrincipalScreen>
   _logOut() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.getBool('isScanning')!) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const SelectCountryScreen()));
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const SelectCountryScreen()));
     }
     if (prefs.getString('lastPage') != 'qr') {
       _cleanPreferences();
@@ -82,21 +84,41 @@ class _PrincipalScreenState extends State<PrincipalScreen>
 
     switch (state) {
       case AppLifecycleState.paused:
-        _logOut();
+        _saveUserDataToCache();
         break;
 
       case AppLifecycleState.resumed:
-        _logOut();
+        _restoreUserDataFromCache();
         break;
 
       case AppLifecycleState.inactive:
-        _logOut();
+        _saveUserDataToCache();
         break;
 
       case AppLifecycleState.detached:
-        _logOut();
+        _saveUserDataToCache();
         break;
     }
+  }
+
+  _saveUserDataToCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('clientName', clientName);
+    prefs.setString('cardNo', cardNo);
+    prefs.setString('currency', currency);
+    prefs.setString('balance', balance);
+    prefs.setString('userID', userID);
+  }
+
+  _restoreUserDataFromCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      clientName = prefs.getString('clientName') ?? '';
+      cardNo = prefs.getString('cardNo') ?? '';
+      currency = prefs.getString('currency') ?? '';
+      balance = prefs.getString('balance') ?? '';
+      userID = prefs.getString('userID') ?? '';
+    });
   }
 
   @override
@@ -137,7 +159,6 @@ class _PrincipalScreenState extends State<PrincipalScreen>
                         ),
                         Positioned(
                           child: Text(
-                            // Format cardNo to "XXXX XXXX XXXX XXXX"
                             '${cardNo.substring(0, 4)} ${cardNo.substring(4, 8)} ${cardNo.substring(8, 12)} ${cardNo.substring(12)}',
                             style: const TextStyle(
                               color: Colors.white,
@@ -232,7 +253,7 @@ class _PrincipalScreenState extends State<PrincipalScreen>
                           decoration: const BoxDecoration(
                               color: Color(0xFF0E2238),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
+                              BorderRadius.all(Radius.circular(10.0))),
                           height: 130,
                           width: 115,
                         ),
@@ -269,7 +290,7 @@ class _PrincipalScreenState extends State<PrincipalScreen>
                           decoration: const BoxDecoration(
                               color: Color(0xFF0E2238),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
+                              BorderRadius.all(Radius.circular(10.0))),
                           height: 130,
                           width: 115,
                         ),
@@ -292,7 +313,7 @@ class _PrincipalScreenState extends State<PrincipalScreen>
                               children: [
                                 IconButton(
                                   icon:
-                                      Image.asset('images/icons/shop_icon.png'),
+                                  Image.asset('images/icons/shop_icon.png'),
                                   onPressed: () {
                                     Navigator.push(
                                         context,
@@ -319,7 +340,7 @@ class _PrincipalScreenState extends State<PrincipalScreen>
                           decoration: const BoxDecoration(
                               color: Color(0xFF0E2238),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
+                              BorderRadius.all(Radius.circular(10.0))),
                           height: 130,
                           width: 115,
                         ),
@@ -356,7 +377,7 @@ class _PrincipalScreenState extends State<PrincipalScreen>
                           decoration: const BoxDecoration(
                               color: Color(0xFF0E2238),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
+                              BorderRadius.all(Radius.circular(10.0))),
                           height: 130,
                           width: 115,
                         ),
