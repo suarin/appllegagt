@@ -4,6 +4,7 @@ import 'package:appllegagt/models/transfer/bank_transfer_response.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:appllegagt/services/transfer_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BankTransferForm extends StatefulWidget {
@@ -307,13 +308,15 @@ class _BankTransferFormState extends State<BankTransferForm>
                               border: InputBorder.none,
                               hintText: 'Web Pin *',
                             ),
+                            keyboardType: TextInputType.phone,
+                            obscureText: true,
+                            inputFormatters: [LengthLimitingTextInputFormatter(4)],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
                             controller: _passwordController,
-                            obscureText: true,
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),

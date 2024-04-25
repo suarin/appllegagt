@@ -1,51 +1,34 @@
-import 'package:appllegagt/models/transfer/card_transfer_response.dart';
 import 'package:appllegagt/services/system_errors.dart';
-import 'package:appllegagt/services/transfer_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:appllegagt/models/general/authorization_response.dart';
+import 'package:appllegagt/services/recharge_services.dart';
 
-class InternationalCardTransfer extends StatefulWidget {
-  const InternationalCardTransfer({Key? key}) : super(key: key);
+
+class PaypalTransferForm extends StatefulWidget {
+  const PaypalTransferForm({Key? key}) : super(key: key);
 
   @override
-  _InternationalCardTransferState createState() =>
-      _InternationalCardTransferState();
+  _PaypalTransferFormState createState() => _PaypalTransferFormState();
 }
 
-class _InternationalCardTransferState extends State<InternationalCardTransfer> {
+class _PaypalTransferFormState extends State<PaypalTransferForm> {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
-  final _passwordController = TextEditingController();
   final _amountController = TextEditingController();
-  final _destinationCardController = TextEditingController();
-  final _notesController = TextEditingController();
+  final _referenceController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool isProcessing = false;
+  AuthorizationResponse? authorizationResponse;
   bool isGT = false;
   bool isUS = false;
   var screenWidth, screenHeight;
 
-  //Load Country Scope
-  _getCountryScope() async {
-    final prefs = await SharedPreferences.getInstance();
-    String countryScope = prefs.getString('countryScope')!;
-    if (countryScope == 'GT') {
-      setState(() {
-        isGT = true;
-      });
-    }
-
-    if (countryScope == 'US') {
-      setState(() {
-        isUS = true;
-      });
-    }
-  }
-
   //functions for dialogs
   _showSuccessResponse(
-      BuildContext context, CardTransferResponse cardTransferResponse) {
+      BuildContext context, AuthorizationResponse authorizationResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -72,40 +55,7 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                             ),
                             SizedBox(
                               child:
-                                  Text(cardTransferResponse.authNo.toString()),
-                              width: 150,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const SizedBox(
-                              child: Text(
-                                'Destinatario',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              width: 150,
-                            ),
-                            SizedBox(
-                              child: Text(cardTransferResponse.transferTo
-                                  .toString()
-                                  .toUpperCase()),
-                              width: 150,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const SizedBox(
-                              child: Text(
-                                'Monto debitado',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              width: 150,
-                            ),
-                            SizedBox(
-                              child: Text(
-                                  '${isUS ? "USD " : "Q "} ${cardTransferResponse.debitedAmount.toString()}'),
+                                  Text(authorizationResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -167,9 +117,9 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
   //Check response
   _checkResponse(BuildContext context, dynamic json) async {
     if (json['ErrorCode'] == 0) {
-      CardTransferResponse cardTransferResponse =
-          CardTransferResponse.fromJson(json);
-      _showSuccessResponse(context, cardTransferResponse);
+      AuthorizationResponse authorizationResponse =
+      AuthorizationResponse.fromJson(json);
+      _showSuccessResponse(context, authorizationResponse);
     } else {
       String errorMessage =
           await SystemErrors.getSystemError(json['ErrorCode']);
@@ -181,10 +131,9 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
   _resetForm() {
     setState(() {
       isProcessing = false;
-      _passwordController.text = '';
-      _notesController.text = '';
+      _referenceController.text = '';
       _amountController.text = '';
-      _destinationCardController.text = '';
+      _passwordController.text = '';
     });
   }
 
@@ -193,18 +142,24 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
     setState(() {
       isProcessing = true;
     });
-    await TransferServices.getCardTransferInt(
-            _passwordController.text,
-            _destinationCardController.text,
-            _amountController.text,
-            _notesController.text)
-        .then((response) => {
-              if (response['ErrorCode'] != null)
-                {
-                  _checkResponse(context, response),
-                }
-            })
-        .catchError((error) {
+
+    try {
+      final response = await RechargeServices.getLoadPayPal(
+          _passwordController.text,
+          _amountController.text,
+          _referenceController.text);
+
+      // Check if response is a Map
+      if (response is Map<String, dynamic>) {
+        if (response.containsKey('ErrorCode')) {
+          _checkResponse(context, response);
+        } else {
+          _showErrorResponse(context, 'Invalid response format');
+        }
+      } else {
+        _showErrorResponse(context, 'Invalid response format');
+      }
+    } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -217,9 +172,11 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
         ),
       );
       _resetForm();
-    });
+    }
+
     _resetForm();
   }
+
 
   _setLastPage() async {
     final prefs = await SharedPreferences.getInstance();
@@ -228,7 +185,6 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
 
   @override
   void initState() {
-    _getCountryScope();
     _setLastPage();
     super.initState();
   }
@@ -236,9 +192,10 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transferencia a cuenta \n Internacional'),
+        title: const Text('Recarga PayPal'),
         backgroundColor: const Color(0XFF0E325F),
       ),
       backgroundColor: const Color(0XFFAFBECC),
@@ -252,74 +209,46 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                   children: [
                     ListView(
                       children: [
-                        if (isUS)
-                          Container(
-                            child: const Text(
-                              'Para Realizar esta Transferencia, primero debe registrar a su destinatario.',
-                              style: TextStyle(
-                                color: Colors.red, // Red color
-                                fontFamily: 'Arial', // Arial font
-                                fontWeight: FontWeight.bold, // Bold font weight
-                              ),
-                            ),
-                            decoration: BoxDecoration(
-                              color: Color(0XFFEFEFEF),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            ),
-                            height: 50.0,
-                            margin: const EdgeInsets.only(bottom: 5.0),
-                            padding: const EdgeInsets.only(left: 10.0),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Color(0XFFEFEFEF),
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
                           ),
-                        isUS
-                            ? Container(
-                                child: TextFormField(
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText:
-                                        'Número de Celular de destino *',
-                                  ),
-                                  keyboardType: TextInputType.phone,
-                                  inputFormatters: [LengthLimitingTextInputFormatter(8)],
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Campo obligatorio';
-                                    }
-                                  },
-                                  controller: _destinationCardController,
-                                ),
-                                decoration: const BoxDecoration(
-                                  color: Color(0XFFEFEFEF),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10.0)),
-                                ),
-                                height: 50.0,
-                                margin: const EdgeInsets.only(bottom: 5.0),
-                                padding: const EdgeInsets.only(left: 10.0),
-                              )
-                            : Container(
-                                child: TextFormField(
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText:
-                                        'Número de Cuenta LLEGA destino *',
-                                  ),
-                                  keyboardType: TextInputType.phone,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Campo obligatorio';
-                                    }
-                                  },
-                                  controller: _destinationCardController,
-                                ),
-                                decoration: const BoxDecoration(
-                                  color: Color(0XFFEFEFEF),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10.0)),
-                                ),
-                                height: 50.0,
-                                margin: const EdgeInsets.only(bottom: 5.0),
-                                padding: const EdgeInsets.only(left: 10.0),
-                              ),
+                          height: 50.0,
+                          margin: const EdgeInsets.only(bottom: 1.0),
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: Text(
+                            'Para hacer la solicitud debe haber realizado su Transferencia en PayPal',
+                            style: TextStyle(
+                              fontSize: 18.0, // Adjust the font size as desired
+                              color: Colors.redAccent, // Adjust the text color
+                              fontFamily: 'Calibri', // Specify the desired font family
+                              fontWeight: FontWeight.bold, // Add bold style
+                            ),
+                          ),
+                        ),
+                        Container(
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Referencia PayPal *',
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Campo obligatorio *';
+                              }
+                            },
+                            controller: _referenceController,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Color(0XFFEFEFEF),
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          height: 50.0,
+                          margin: const EdgeInsets.only(bottom: 5.0),
+                          padding: const EdgeInsets.only(left: 10.0),
+                        ),
                         Container(
                           child: TextFormField(
                             decoration: const InputDecoration(
@@ -333,28 +262,6 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                               }
                             },
                             controller: _amountController,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                        ),
-                        Container(
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Nota',
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obligatorio *';
-                              }
-                            },
-                            controller: _notesController,
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
@@ -394,16 +301,14 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                           child: Container(
                             child: TextButton(
                               child: const Text(
-                                'Transferir',
+                                'Solicitar',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0,
                                 ),
                               ),
                               onPressed: () {
-                                if (_formKey.currentState!.validate()) {
                                   _executeTransaction(context);
-                                }
                               },
                             ),
                             decoration: const BoxDecoration(

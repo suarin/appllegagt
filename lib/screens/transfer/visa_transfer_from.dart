@@ -1,51 +1,58 @@
-import 'package:appllegagt/models/transfer/card_transfer_response.dart';
+import 'package:appllegagt/models/general/authorization_response.dart';
+import 'package:appllegagt/models/general/visa_card.dart';
+import 'package:appllegagt/models/general/visa_cards_response.dart';
+import 'package:appllegagt/services/general_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:appllegagt/services/transfer_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class InternationalCardTransfer extends StatefulWidget {
-  const InternationalCardTransfer({Key? key}) : super(key: key);
+class VisaTransferFrom extends StatefulWidget {
+  const VisaTransferFrom({Key? key}) : super(key: key);
 
   @override
-  _InternationalCardTransferState createState() =>
-      _InternationalCardTransferState();
+  _VisaTransferFromState createState() => _VisaTransferFromState();
 }
 
-class _InternationalCardTransferState extends State<InternationalCardTransfer> {
+class _VisaTransferFromState extends State<VisaTransferFrom>
+    with WidgetsBindingObserver {
   //Variables
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldStateKey = GlobalKey<ScaffoldState>();
   final _passwordController = TextEditingController();
   final _amountController = TextEditingController();
-  final _destinationCardController = TextEditingController();
-  final _notesController = TextEditingController();
-  bool isProcessing = false;
-  bool isGT = false;
-  bool isUS = false;
+  final _visaCardController = TextEditingController();
   var screenWidth, screenHeight;
+  bool isProcessing = false;
+  AuthorizationResponse authorizationResponse = AuthorizationResponse();
+  VisaCardsResponse? cards;
+  VisaCard? selectedVisaCard;
+  bool visaCardsLoaded = false;
+  bool _termsAndConditionsAccepted = false;
 
-  //Load Country Scope
-  _getCountryScope() async {
-    final prefs = await SharedPreferences.getInstance();
-    String countryScope = prefs.getString('countryScope')!;
-    if (countryScope == 'GT') {
-      setState(() {
-        isGT = true;
-      });
-    }
+  //function to obtain Visa Cards for picker
+  _getVisaCards() async {
+    await GeneralServices.getVisaCards().then((list) => {
+          setState(() {
+            cards = VisaCardsResponse.fromJson(list);
+            visaCardsLoaded = true;
+          })
+        });
+  }
 
-    if (countryScope == 'US') {
+  // Function to toggle the acceptance of terms and conditions
+  void _toggleTermsAndConditions(bool? newValue) {
+    if(newValue != null) {
       setState(() {
-        isUS = true;
+        _termsAndConditionsAccepted = newValue;
       });
     }
   }
 
   //functions for dialogs
   _showSuccessResponse(
-      BuildContext context, CardTransferResponse cardTransferResponse) {
+      BuildContext context, AuthorizationResponse authorizationResponse) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -65,47 +72,14 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                           children: [
                             const SizedBox(
                               child: Text(
-                                'Autorizacion',
+                                'No Autorizacion',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               width: 150,
                             ),
                             SizedBox(
                               child:
-                                  Text(cardTransferResponse.authNo.toString()),
-                              width: 150,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const SizedBox(
-                              child: Text(
-                                'Destinatario',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              width: 150,
-                            ),
-                            SizedBox(
-                              child: Text(cardTransferResponse.transferTo
-                                  .toString()
-                                  .toUpperCase()),
-                              width: 150,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const SizedBox(
-                              child: Text(
-                                'Monto debitado',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              width: 150,
-                            ),
-                            SizedBox(
-                              child: Text(
-                                  '${isUS ? "USD " : "Q "} ${cardTransferResponse.debitedAmount.toString()}'),
+                                  Text(authorizationResponse.authNo.toString()),
                               width: 150,
                             ),
                           ],
@@ -166,25 +140,28 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
 
   //Check response
   _checkResponse(BuildContext context, dynamic json) async {
-    if (json['ErrorCode'] == 0) {
-      CardTransferResponse cardTransferResponse =
-          CardTransferResponse.fromJson(json);
-      _showSuccessResponse(context, cardTransferResponse);
-    } else {
-      String errorMessage =
-          await SystemErrors.getSystemError(json['ErrorCode']);
-      _showErrorResponse(context, errorMessage);
+    try {
+      if (json['ErrorCode'] == 0) {
+        AuthorizationResponse authorizationResponse =
+            AuthorizationResponse.fromJson(json);
+        _showSuccessResponse(context, authorizationResponse);
+      } else {
+        String errorMessage =
+            await SystemErrors.getSystemError(json['ErrorCode']);
+        _showErrorResponse(context, errorMessage);
+      }
+    } catch (e) {
+      _showErrorResponse(context, e.toString());
     }
   }
 
-  //Reset form
+  //Reset From
   _resetForm() {
     setState(() {
       isProcessing = false;
       _passwordController.text = '';
-      _notesController.text = '';
       _amountController.text = '';
-      _destinationCardController.text = '';
+      _visaCardController.text = '';
     });
   }
 
@@ -193,11 +170,8 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
     setState(() {
       isProcessing = true;
     });
-    await TransferServices.getCardTransferInt(
-            _passwordController.text,
-            _destinationCardController.text,
-            _amountController.text,
-            _notesController.text)
+    await TransferServices.getVisaUnload(_passwordController.text,
+            _amountController.text, selectedVisaCard!.cardNo.toString())
         .then((response) => {
               if (response['ErrorCode'] != null)
                 {
@@ -216,8 +190,10 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
           backgroundColor: Colors.red,
         ),
       );
+
       _resetForm();
     });
+
     _resetForm();
   }
 
@@ -228,7 +204,7 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
 
   @override
   void initState() {
-    _getCountryScope();
+    _getVisaCards();
     _setLastPage();
     super.initState();
   }
@@ -236,9 +212,13 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transferencia a cuenta \n Internacional'),
+        title: const Text(
+          'Transferencia desde \n Tarjeta Visa',
+          style: TextStyle(fontSize: 16),
+        ),
         backgroundColor: const Color(0XFF0E325F),
       ),
       backgroundColor: const Color(0XFFAFBECC),
@@ -252,73 +232,69 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                   children: [
                     ListView(
                       children: [
-                        if (isUS)
-                          Container(
-                            child: const Text(
-                              'Para Realizar esta Transferencia, primero debe registrar a su destinatario.',
-                              style: TextStyle(
-                                color: Colors.red, // Red color
-                                fontFamily: 'Arial', // Arial font
-                                fontWeight: FontWeight.bold, // Bold font weight
-                              ),
-                            ),
-                            decoration: BoxDecoration(
-                              color: Color(0XFFEFEFEF),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            ),
-                            height: 50.0,
-                            margin: const EdgeInsets.only(bottom: 5.0),
-                            padding: const EdgeInsets.only(left: 10.0),
-                          ),
-                        isUS
+                        visaCardsLoaded
                             ? Container(
-                                child: TextFormField(
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText:
-                                        'Número de Celular de destino *',
+                                child: DropdownButton<VisaCard>(
+                                  hint: const Text(
+                                    'Seleccionar Tarjeta',
+                                    style: TextStyle(
+                                      color: Colors.black26,
+                                      fontFamily: 'VarelaRoundRegular',
+                                    ),
                                   ),
-                                  keyboardType: TextInputType.phone,
-                                  inputFormatters: [LengthLimitingTextInputFormatter(8)],
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Campo obligatorio';
-                                    }
+                                  value: selectedVisaCard,
+                                  onChanged: (VisaCard? value) {
+                                    setState(() {
+                                      selectedVisaCard = value;
+                                    });
                                   },
-                                  controller: _destinationCardController,
+                                  items: cards!.visaCards!
+                                      .map((VisaCard visaCard) {
+                                    return DropdownMenuItem<VisaCard>(
+                                      value: visaCard,
+                                      child: Container(
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        width: 250,
+                                        child: Text(
+                                          '${visaCard.cardNo}',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'VarelaRoundRegular',
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
-                                decoration: const BoxDecoration(
-                                  color: Color(0XFFEFEFEF),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10.0)),
-                                ),
-                                height: 50.0,
-                                margin: const EdgeInsets.only(bottom: 5.0),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                margin: const EdgeInsets.only(bottom: 15.0),
                                 padding: const EdgeInsets.only(left: 10.0),
+                                width: 300,
                               )
                             : Container(
-                                child: TextFormField(
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText:
-                                        'Número de Cuenta LLEGA destino *',
-                                  ),
+                                child: const TextField(
+                                  decoration: InputDecoration(
+                                      label: Text(
+                                        'Sin Tarjetas',
+                                        style: TextStyle(
+                                          color: Colors.black26,
+                                          fontFamily: 'VarelaRoundRegular',
+                                        ),
+                                      ),
+                                      border: InputBorder.none),
                                   keyboardType: TextInputType.phone,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Campo obligatorio';
-                                    }
-                                  },
-                                  controller: _destinationCardController,
                                 ),
-                                decoration: const BoxDecoration(
-                                  color: Color(0XFFEFEFEF),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10.0)),
-                                ),
-                                height: 50.0,
-                                margin: const EdgeInsets.only(bottom: 5.0),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30.0))),
+                                margin: const EdgeInsets.only(bottom: 15.0),
                                 padding: const EdgeInsets.only(left: 10.0),
+                                width: 300,
                               ),
                         Container(
                           child: TextFormField(
@@ -333,28 +309,6 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                               }
                             },
                             controller: _amountController,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Color(0XFFEFEFEF),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          height: 50.0,
-                          margin: const EdgeInsets.only(bottom: 5.0),
-                          padding: const EdgeInsets.only(left: 10.0),
-                        ),
-                        Container(
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Nota',
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obligatorio *';
-                              }
-                            },
-                            controller: _notesController,
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
@@ -390,6 +344,34 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                           margin: const EdgeInsets.only(bottom: 5.0),
                           padding: const EdgeInsets.only(left: 10.0),
                         ),
+                        // Add CheckboxListTile for terms and conditions
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border.all(color: Colors.black),
+                          ),
+                          padding: EdgeInsets.all(10.0),
+                          margin: EdgeInsets.only(bottom: 10.0),
+                          child: Row(
+                            children: [
+                              Checkbox(
+                                value: _termsAndConditionsAccepted,
+                                onChanged: _toggleTermsAndConditions,
+                              ),
+                              Text(
+                                "Solicito y autorizo a GPS PAY (LLEGA) \n "
+                                    "a debitar de mi Tarjeta VISA DCBank \n"
+                                    "el equivalente en CAD Dollar del Monto \n"
+                                    "aqui solicitado.",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                         Visibility(
                           child: Container(
                             child: TextButton(
@@ -413,7 +395,7 @@ class _InternationalCardTransferState extends State<InternationalCardTransfer> {
                             ),
                             width: screenWidth,
                           ),
-                          visible: !isProcessing,
+                          visible: _termsAndConditionsAccepted || isProcessing,
                         ),
                       ],
                     ),

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:appllegagt/models/country.dart';
 import 'package:appllegagt/models/document_type.dart';
 import 'package:appllegagt/models/general/cooperative.dart';
@@ -619,10 +618,10 @@ class _RegistrationFormState extends State<RegistrationForm>
                     ),
                     top: 5.0,
                   ),
-                  Positioned(
-                    child: Visibility(
-                      child: Container(
-                        child: const Text(
+                    Positioned(
+                      child: Visibility(
+                        child: Container(
+                          child: const Text(
                           'Espere..\n procesando registro...',
                           style: TextStyle(color: Colors.white, fontSize: 28.0),
                         ),

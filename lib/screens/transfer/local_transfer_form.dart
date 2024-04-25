@@ -4,6 +4,7 @@ import 'package:appllegagt/models/transfer/card_transfer_response.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:appllegagt/services/transfer_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalTransferForm extends StatefulWidget {
@@ -380,7 +381,9 @@ class _LocalTransferFormState extends State<LocalTransferForm>
                               border: InputBorder.none,
                               hintText: 'PIN WEB *',
                             ),
+                            keyboardType: TextInputType.phone,
                             obscureText: true,
+                            inputFormatters: [LengthLimitingTextInputFormatter(4)],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';

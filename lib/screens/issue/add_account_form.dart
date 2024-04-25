@@ -214,13 +214,14 @@ class _AddAccountFormState extends State<AddAccountForm>
                           child: TextFormField(
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Usuario *',
+                              hintText: 'Usuario/Telefono *',
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
+                            keyboardType: TextInputType.phone,
                             controller: _userController,
                           ),
                           decoration: const BoxDecoration(

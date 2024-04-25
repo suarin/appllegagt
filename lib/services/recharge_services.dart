@@ -50,7 +50,8 @@ class RechargeServices {
 
     //Prepare uri
     var url = Uri.parse(
-      '${baseUrl + ApiResources.reqZelleInfoUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqBankID=TRU',
+      '${baseUrl + ApiResources
+          .reqZelleInfoUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqBankID=TRU',
     );
 
     //Request Info
@@ -92,7 +93,8 @@ class RechargeServices {
     var reqCHolderID = await getCHolderID();
     //Prepare Uri
     var url = Uri.parse(
-        '${baseUrl + ApiResources.loadBkUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqPassword=$reqPassword&ReqBankID=$reqBankID&ReqAmount=$reqAmount&ReqReferenceNo=$reqReferenceNo&ReqSender=$reqSender');
+        '${baseUrl + ApiResources
+            .loadBkUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqPassword=$reqPassword&ReqBankID=$reqBankID&ReqAmount=$reqAmount&ReqReferenceNo=$reqReferenceNo&ReqSender=$reqSender');
     //Send card transfer
     http.Response response;
     try {
@@ -127,7 +129,8 @@ class RechargeServices {
     var reqCHolderID = await getCHolderID();
     //Prepare Uri
     var url = Uri.parse(
-        '${baseUrl + ApiResources.loadBkUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqPassword=$reqPassword&ReqBankID=$reqBankID&ReqAmount=$reqAmount&ReqReferenceNo=$reqReferenceNo');
+        '${baseUrl + ApiResources
+            .loadBkUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqPassword=$reqPassword&ReqBankID=$reqBankID&ReqAmount=$reqAmount&ReqReferenceNo=$reqReferenceNo');
     //Send card transfer
     http.Response response;
     try {
@@ -152,8 +155,7 @@ class RechargeServices {
     }
   }
 
-  static Future<dynamic> getCardLoadVoucher(
-      String reqMMerchantID,
+  static Future<dynamic> getCardLoadVoucher(String reqMMerchantID,
       String reqPaymentTypeID,
       String reqVoucherNumber,
       String reqCardNumber,
@@ -165,7 +167,8 @@ class RechargeServices {
     var reqCHolderID = await getCHolderID();
     //Prepare Uri
     var url = Uri.parse(
-        '${baseUrl + ApiResources.cardLoadVoucherUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqMMerchantID=$reqMMerchantID&ReqPaymentTypeID=$reqPaymentTypeID&ReqVoucherNumber=$reqVoucherNumber&ReqCardNumber=$reqCardNumber&ReqMobileNo=$reqMobileNo');
+        '${baseUrl + ApiResources
+            .cardLoadVoucherUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqMMerchantID=$reqMMerchantID&ReqPaymentTypeID=$reqPaymentTypeID&ReqVoucherNumber=$reqVoucherNumber&ReqCardNumber=$reqCardNumber&ReqMobileNo=$reqMobileNo');
 
     //Send card transfer
     http.Response response;
@@ -199,7 +202,8 @@ class RechargeServices {
     var reqCHolderID = await getCHolderID();
     //Prepare Uri
     var url = Uri.parse(
-        '${baseUrl + ApiResources.loadPaySafeUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqAmount=$reqAmount');
+        '${baseUrl + ApiResources
+            .loadPaySafeUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqAmount=$reqAmount');
 
     //Send card transfer
     http.Response response;
@@ -224,8 +228,8 @@ class RechargeServices {
     }
   }
 
-  static Future<dynamic> getLoadPaySafeCode(
-      String reqAmount, String reqPayToken) async {
+  static Future<dynamic> getLoadPaySafeCode(String reqAmount,
+      String reqPayToken) async {
     var merchantId = await reqMerchantID();
     var token = await reqToken();
     var baseUrl = await getBaseUrl();
@@ -233,7 +237,8 @@ class RechargeServices {
     var reqCHolderID = await getCHolderID();
     //Prepare Uri
     var url = Uri.parse(
-        '${baseUrl + ApiResources.loadPaySafeDepositUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqAmount=$reqAmount&ReqPayToken=$reqPayToken');
+        '${baseUrl + ApiResources
+            .loadPaySafeDepositUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqAmount=$reqAmount&ReqPayToken=$reqPayToken');
 
     //Send card transfer
     http.Response response;
@@ -258,8 +263,7 @@ class RechargeServices {
     }
   }
 
-  static Future<dynamic> getCardLoadCash(
-      String reqMMerchantID,
+  static Future<dynamic> getCardLoadCash(String reqMMerchantID,
       String reqMPassw,
       String reqCardNumber,
       String reqMobileNo,
@@ -271,7 +275,8 @@ class RechargeServices {
     var reqCHolderID = await getCHolderID();
     //Prepare Uri
     var url = Uri.parse(
-        '${baseUrl + ApiResources.cardLoadCashUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqMMerchantID=$reqMMerchantID&ReqMPassw=$reqMPassw&ReqCardNumber=$reqCardNumber&ReqMobileNo=$reqMobileNo&ReqAmount=$reqAmount');
+        '${baseUrl + ApiResources
+            .cardLoadCashUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqMMerchantID=$reqMMerchantID&ReqMPassw=$reqMPassw&ReqCardNumber=$reqCardNumber&ReqMobileNo=$reqMobileNo&ReqAmount=$reqAmount');
 
     //Send card transfer
     http.Response response;
@@ -290,7 +295,41 @@ class RechargeServices {
       try {
         return json.decode(decoded);
       } catch (e) {
-        return 'Error json deoce: ${e.toString()}';
+        return 'Error json decode: ${e.toString()}';
+      }
+    } else {
+      return 'Error en el servidor: ${response.body}';
+    }
+  }
+
+  static Future<dynamic> getLoadPayPal(String reqPassword, String reqTotal,
+      String reqReference) async {
+    var merchantId = await reqMerchantID();
+    var token = await reqToken();
+    var baseUrl = await getBaseUrl();
+    //get CHolderID
+    var reqCHolderID = await getCHolderID();
+    //Prepare Uri
+    var url = Uri.parse(
+        '${baseUrl + ApiResources
+            .loadPayPal}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqPassword=$reqPassword&ReqAmount=$reqTotal&ReqReferenceNo=$reqReference');
+    //Send card transfer
+    http.Response response;
+    try {
+      response = await http.get(url, headers: {
+        HttpHeaders.contentTypeHeader: "application/x-www-form-urlencoded"
+      });
+    } catch (e) {
+      return 'Error: ${e.toString()}';
+    }
+    //validates that http response is ok code 200
+    if (response.statusCode == 200) {
+      const codec = Windows1252Codec(allowInvalid: false);
+      final decoded = codec.decode(response.bodyBytes);
+      try {
+        return json.decode(decoded);
+      } catch (e) {
+        return 'Error json decode: ${e.toString()}';
       }
     } else {
       return 'Error en el servidor: ${response.body}';

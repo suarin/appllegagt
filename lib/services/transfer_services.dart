@@ -187,6 +187,45 @@ class TransferServices {
     }
   }
 
+  static Future<dynamic> getVisaUnload(
+      String reqPassword,
+      String reqAmount,
+      String reqVisaCardNumber,
+      ) async {
+    var merchantId = await reqMerchantID();
+    var token = await reqToken();
+    var baseUrl = await getBaseUrl();
+    //get CHolderID
+    var reqCHolderID = await getCHolderID();
+    //Prepare Uri
+    var url = Uri.parse(
+        '${baseUrl + ApiResources.visaUnloadUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqPassword=$reqPassword&ReqAmount=$reqAmount&ReqVisaCardNumber=$reqVisaCardNumber');
+
+    //Send card transfer
+    http.Response response;
+    try {
+      response = await http.get(url, headers: {
+        HttpHeaders.contentTypeHeader: "application/x-www-form-urlencoded"
+      });
+    } catch (e) {
+      return 'Error: ${e.toString()}';
+    }
+    //validates that http response is ok code 200
+    if (response.statusCode == 200) {
+      //if is ok return the decoded body of response, returns: CHolderID, UserName, CardNo, Currency and Balance
+      const codec = Windows1252Codec(allowInvalid: false);
+      final decoded = codec.decode(response.bodyBytes);
+
+      try {
+        return json.decode(decoded);
+      } catch (e) {
+        return 'Error json deoce: ${e.toString()}';
+      }
+    } else {
+      return 'Error en el servidor: ${response.body}';
+    }
+  }
+
   static Future<dynamic> getBankAccounts() async {
     var merchantId = await reqMerchantID();
     var token = await reqToken();

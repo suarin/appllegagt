@@ -290,13 +290,13 @@ class _VisaRequestFormState extends State<VisaRequestForm>
                               border: InputBorder.none,
                               hintText: 'Codigo Postal *',
                             ),
+                            keyboardType: TextInputType.phone,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';
                               }
                             },
                             controller: _zipController,
-                            keyboardType: TextInputType.phone,
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),

@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isProcessing = false;
   bool isGT = false;
   bool isUS = false;
+  bool _submitted = false;
 
   //Load Country Scope
   _getCountryScope() async {
@@ -85,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
   _checkResponse(BuildContext context, dynamic json) async {
     if (json['ErrorCode'] == 0) {
       LoginSuccessResponse loginSuccessResponse =
-          LoginSuccessResponse.fromJson(json);
+      LoginSuccessResponse.fromJson(json);
       final prefs = await SharedPreferences.getInstance();
 
       await prefs.setInt('cHolderID', loginSuccessResponse.cHolderID!);
@@ -100,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => const PrincipalScreen()));
     } else {
       String errorMessage =
-          await SystemErrors.getSystemError(json['ErrorCode']);
+      await SystemErrors.getSystemError(json['ErrorCode']);
       _showErrorResponse(context, errorMessage);
     }
   }
@@ -115,35 +116,46 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   //Execute registration
-  _executeTransaction(BuildContext context) async {
+  // Update the _executeTransaction method to set _submitted flag and validate the form
+  Future<void> _executeTransaction(BuildContext context) async {
+    // Set _submitted to true to trigger validation for all fields
     setState(() {
-      isProcessing = true;
-      userID = _userController.text;
+      _submitted = true;
     });
-    await GeneralServices.getLogin(
-            _userController.text, _passwordController.text)
-        .then((response) => {
-              if (response['ErrorCode'] != null)
-                {
-                  _checkResponse(context, response),
-                }
-            })
-        .catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error.toString(),
-            style: const TextStyle(
-              color: Colors.white,
+
+    if (_formKey.currentState!.validate()) {
+      // Form is valid, proceed with the transaction
+      setState(() {
+        isProcessing = true;
+        userID = _userController.text;
+      });
+      try {
+        var response = await GeneralServices.getLogin(
+            _userController.text, _passwordController.text);
+        if (response['ErrorCode'] != null) {
+          _checkResponse(context, response);
+        }
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error.toString(),
+              style: const TextStyle(
+                color: Colors.white,
+              ),
             ),
+            backgroundColor: Colors.red,
           ),
-          backgroundColor: Colors.red,
-        ),
-      );
-      _resetForm();
-    });
-    _resetForm();
+        );
+      } finally {
+        // Reset the form and processing state
+        _resetForm();
+      }
+    }
   }
+
+
+
 
   @override
   void initState() {
@@ -151,6 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     // getting the size of the device windows
     screenSize = MediaQuery.of(context).size;
@@ -200,30 +213,31 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
+                              BorderRadius.all(Radius.circular(10))),
                           child: TextFormField(
-                            decoration: const InputDecoration(
-                              hintText: 'No. Celular *',
-                              border: InputBorder.none,
-                            ),
-                            keyboardType: TextInputType.phone,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                              fontSize: 24.0,
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obligatorio';
-                              }
-                              if (value.length < 8) {
-                                return 'Mínimo 8 caracteres';
-                              }
-                              if (value.length > 10) {
-                                return 'Máximo 10 caracteres';
-                              }
-                            },
-                            controller: _userController,
-                          ),
+                              decoration: const InputDecoration(
+                                hintText: 'No. Celular *',
+                                border: InputBorder.none,
+                              ),
+                              keyboardType: TextInputType.phone,
+                              textAlign: TextAlign.start,
+                              style: const TextStyle(
+                                fontSize: 24.0,
+                              ),
+                              validator: (value) {
+                                if (_submitted && (value == null || value.isEmpty)) {
+                                  return 'Campo obligatorio';
+                                }
+                                if (_submitted && (value?.length ?? 0) < 8) {
+                                  return 'Mínimo 8 caracteres';
+                                }
+                                if (_submitted && (value?.length ?? 0) > 10) {
+                                  return 'Máximo 10 caracteres';
+                                }
+                                return null; // Return null if validation succeeds
+                              },
+                              controller: _userController
+                              ),
                           padding: const EdgeInsets.all(5),
                           width: 300,
                           height: 50,
@@ -236,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
+                              BorderRadius.all(Radius.circular(10))),
                           child: TextFormField(
                             decoration: const InputDecoration(
                               hintText: 'PIN de Acceso *',
@@ -247,15 +261,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             textAlign: TextAlign.start,
                             style: const TextStyle(fontSize: 24.0),
                             validator: (value) {
-                              if (value == null || value.isEmpty) {
+                              if (_submitted && (value == null || value.isEmpty)) {
                                 return 'Campo obligatorio';
                               }
-                              if (value.length < 4) {
+                              if (_submitted && (value?.length ?? 0) < 4) {
                                 return 'Mínimo 4 caracteres';
                               }
-                              if (value.length > 4) {
+                              if (_submitted && (value?.length ?? 0) > 4) {
                                 return 'Máximo 4 caracteres';
                               }
+                              return null; // Return null if validation succeeds
                             },
                             controller: _passwordController,
                           ),
@@ -274,9 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               _executeTransaction(context);
                             },
                             style: TextButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              primary: Colors.white,
+                              foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               backgroundColor: const Color(0xFF4F81BD),
                               minimumSize: const Size(300.0, 50.0),
                               textStyle: const TextStyle(
@@ -297,14 +310,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const CustomerAccessForm(),
+                                const CustomerAccessForm(),
                               ),
                             );
                           },
                           style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            primary: Colors.white,
+                            foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             backgroundColor: const Color(0xFF4F81BD),
                             minimumSize: const Size(300.0, 50.0),
                             textStyle: const TextStyle(
@@ -335,59 +346,59 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       isUS
                           ? Positioned(
-                              child: Container(
-                                child: const Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    'Powered by GPS PAY WALLET',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                    ),
+                            child: Container(
+                              child: const Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Powered by GPS PAY WALLET',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
                                   ),
                                 ),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                      width: 1,
-                                      color: const Color(0xFFAFBECC),
-                                    ),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(10))),
-                                padding: const EdgeInsets.all(10.0),
-                                width: 300,
-                                height: 50,
                               ),
-                              top: powerByBottomDistance,
-                              left: startSesionTextLeftDistance,
-                            )
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                    width: 1,
+                                    color: const Color(0xFFAFBECC),
+                                  ),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              padding: const EdgeInsets.all(10.0),
+                              width: 300,
+                              height: 50,
+                            ),
+                            top: powerByBottomDistance,
+                            left: startSesionTextLeftDistance,
+                          )
                           : const Text(''),
                       isGT
                           ? Positioned(
-                              child: Container(
-                                child: const Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    'Powered by YPayme',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                    ),
+                            child: Container(
+                              child: const Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Powered by YPayme',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
                                   ),
                                 ),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                      width: 1,
-                                      color: const Color(0xFFAFBECC),
-                                    ),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(10))),
-                                padding: const EdgeInsets.all(10.0),
-                                width: 300,
-                                height: 50,
                               ),
-                              top: powerByBottomDistance,
-                              left: startSesionTextLeftDistance,
-                            )
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                    width: 1,
+                                    color: const Color(0xFFAFBECC),
+                                  ),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              padding: const EdgeInsets.all(10.0),
+                              width: 300,
+                              height: 50,
+                            ),
+                        top: powerByBottomDistance,
+                        left: startSesionTextLeftDistance,
+                      )
                           : const Text(''),
                     ],
                   ),

@@ -275,7 +275,7 @@ class GeneralServices {
     var reqCHolderID = await getCHolderID();
     //Prepare Uri
     var url = Uri.parse(
-        '${baseUrl + ApiResources.visaRequestUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqPassword=$reqPassword&ReqAddress=$reqAddress&ReqCityID=$reqCityID&ReqProvinceID=$reqProvinceID&ReqZipCode=$reqProvinceID&ReqPhone=$reqPhone');
+        '${baseUrl + ApiResources.visaRequestUri}?ReqMerchantID=$merchantId&ReqToken=$token&ReqCHolderID=$reqCHolderID&ReqPassword=$reqPassword&ReqAddress=$reqAddress&ReqCityID=$reqCityID&ReqProvinceID=$reqProvinceID&ReqZipCode=$reqZipCode&ReqPhone=$reqPhone');
     //Send card transfer
     http.Response response;
     try {

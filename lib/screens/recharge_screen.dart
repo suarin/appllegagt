@@ -2,6 +2,7 @@ import 'package:appllegagt/models/general/login_success_response.dart';
 import 'package:appllegagt/screens/procedure_screen.dart';
 import 'package:appllegagt/screens/recharge/ach_transfer_form.dart';
 import 'package:appllegagt/screens/recharge/akisi_cash_form.dart';
+import 'package:appllegagt/screens/recharge/paypal_options_screen.dart';
 import 'package:appllegagt/screens/recharge/card_load_voucher_form.dart';
 import 'package:appllegagt/screens/recharge/pay_safe_options_screen.dart';
 import 'package:appllegagt/screens/recharge/ypayme_bank_deposit_form.dart';
@@ -372,6 +373,20 @@ class _RechargeScreenState extends State<RechargeScreen>
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         const PaySafeOptionsScreen(),
+                                  ),
+                                );
+                              },
+                            )
+                          : const Text(' '),
+                      isUS
+                          ? OptionButton(
+                              label: 'Desde su cuenta PayPal',
+                              onPress: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                    const PayPalOptionsScreen(),
                                   ),
                                 );
                               },

@@ -4,6 +4,7 @@ import 'package:appllegagt/models/general/authorization_response.dart';
 import 'package:appllegagt/services/recharge_services.dart';
 import 'package:appllegagt/services/system_errors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BankDepositForm extends StatefulWidget {
@@ -333,6 +334,9 @@ class _BankDepositFormState extends State<BankDepositForm>
                               border: InputBorder.none,
                               hintText: 'PIN WEB',
                             ),
+                            keyboardType: TextInputType.phone,
+                            obscureText: true,
+                            inputFormatters: [LengthLimitingTextInputFormatter(4)],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';

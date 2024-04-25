@@ -145,6 +145,7 @@ class _CardTransactionsFormState extends State<CardTransactionsForm>
                               border: InputBorder.none,
                               hintText: 'Web Pin *',
                             ),
+                            keyboardType: TextInputType.phone,
                             obscureText: true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter/services.dart';
 import 'package:appllegagt/models/bank.dart';
 import 'package:appllegagt/models/general/authorization_response.dart';
 import 'package:appllegagt/services/recharge_services.dart';
@@ -293,7 +293,7 @@ class _YPayMeBankDepositFormState extends State<YPayMeBankDepositForm> {
                                 return 'Campo obligatorio';
                               }
                             },
-                            controller: _referenceController,
+                            controller: _senderControoler,
                           ),
                           decoration: const BoxDecoration(
                             color: Color(0XFFEFEFEF),
@@ -332,6 +332,9 @@ class _YPayMeBankDepositFormState extends State<YPayMeBankDepositForm> {
                               border: InputBorder.none,
                               hintText: 'PIN WEB',
                             ),
+                            keyboardType: TextInputType.phone,
+                            obscureText: true,
+                            inputFormatters: [LengthLimitingTextInputFormatter(4)],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';

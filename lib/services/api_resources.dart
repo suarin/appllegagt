@@ -58,6 +58,9 @@ class ApiResources {
   //Visa Transfer: This method is used to transfer money from customer’s account to the Pre-Paid Visa GPS PAY Card.
   static const String visaLoadUri = 'Card/visaload';
 
+  //Visa Transfer: This method is used to unload the Visa Card from Canada.
+  static const String visaUnloadUri = 'Card/visaunload';
+
   //Bank Accounts
   static const String bankAccountsUri = 'card/bankaccounts';
 
@@ -94,6 +97,9 @@ class ApiResources {
 
   //PaySafeDepositRequest
   static const String loadPaySafeDepositUri = 'card/reqPaySafe';
+
+  //Paypal
+  static const String loadPayPal = 'Card/LoadPayPal';
 
   //Purchase
   //Qr Purchase

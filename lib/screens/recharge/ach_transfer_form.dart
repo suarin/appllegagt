@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:appllegagt/models/bank.dart';
 import 'package:appllegagt/models/general/authorization_response.dart';
 import 'package:appllegagt/services/recharge_services.dart';
@@ -321,6 +320,8 @@ class _AchTransferFormState extends State<AchTransferForm>
                               border: InputBorder.none,
                               hintText: 'PIN WEB',
                             ),
+                            keyboardType: TextInputType.phone,
+                            obscureText: true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Campo obligatorio';

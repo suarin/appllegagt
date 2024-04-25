@@ -7,6 +7,7 @@ import 'package:appllegagt/screens/transfer/bank_transfer_form.dart';
 import 'package:appllegagt/screens/transfer/international_card_transfer.dart';
 import 'package:appllegagt/screens/transfer/local_transfer_form.dart';
 import 'package:appllegagt/screens/transfer/visa_transfer_form.dart';
+import 'package:appllegagt/screens/transfer/visa_transfer_from.dart';
 import 'package:appllegagt/screens/transfer/virtual_transfer_form.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -372,7 +373,7 @@ class _TransferScreenState extends State<TransferScreen>
                             : const Text(''),
                         isUS
                             ? OptionButton(
-                                label: 'Hacia cuenta LLEGA\n en GUATEMALA',
+                                label: 'Hacia cuenta LLEGA/TIGO Money\n en GUATEMALA',
                                 onPress: () {
                                   Navigator.push(
                                     context,
@@ -393,6 +394,20 @@ class _TransferScreenState extends State<TransferScreen>
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         const VirtualTransferForm(),
+                              ),
+                            );
+                          },
+                        )
+                            : const Text(''),
+                        isUS
+                            ? OptionButton(
+                              label: 'Desde Tarjeta Visa Canada',
+                              onPress: () {
+                              Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                const VisaTransferFrom(),
                               ),
                             );
                           },

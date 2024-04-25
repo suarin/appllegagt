@@ -308,6 +308,7 @@ class _QrShopFormState extends State<QrShopForm> with WidgetsBindingObserver {
                                 fontSize: 8,
                               ),
                             ),
+                            keyboardType: TextInputType.phone,
                             obscureText: true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
